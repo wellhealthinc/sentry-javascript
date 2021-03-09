@@ -1,6 +1,6 @@
 import { eventToSentryRequest, sessionToSentryRequest } from '@sentry/core';
 import { Event, Response, Session, TransportOptions } from '@sentry/types';
-import { logger, SentryError } from '@sentry/utils';
+import { SentryError } from '@sentry/utils';
 import * as https from 'https';
 
 import { BaseTransport } from './base';
