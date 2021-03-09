@@ -11,7 +11,7 @@ import * as os from 'os';
 import * as url from 'url';
 
 import { NodeClient } from './client';
-import { flush } from './sdk';
+import { flush, withAutosessionTracking } from './sdk';
 
 const DEFAULT_SHUTDOWN_TIMEOUT = 2000;
 
@@ -375,35 +375,38 @@ export type RequestHandlerOptions = ParseRequestOptions & {
 export function requestHandler(
   options?: RequestHandlerOptions,
 ): (req: http.IncomingMessage, res: http.ServerResponse, next: (error?: any) => void) => void {
-  return function sentryRequestMiddleware(
-    req: http.IncomingMessage,
-    res: http.ServerResponse,
-    next: (error?: any) => void,
-  ): void {
-    if (options && options.flushTimeout && options.flushTimeout > 0) {
-      // eslint-disable-next-line @typescript-eslint/unbound-method
-      const _end = res.end;
-      res.end = function(chunk?: any | (() => void), encoding?: string | (() => void), cb?: () => void): void {
-        flush(options.flushTimeout)
-          .then(() => {
-            _end.call(this, chunk, encoding, cb);
-          })
-          .then(null, e => {
-            logger.error(e);
-          });
-      };
-    }
-    const local = domain.create();
-    local.add(req);
-    local.add(res);
-    local.on('error', next);
-    local.run(() => {
-      getCurrentHub().configureScope(scope =>
-        scope.addEventProcessor((event: Event) => parseRequest(event, req, options)),
-      );
-      next();
-    });
-  };
+  return withAutosessionTracking(
+    function sentryRequestMiddleware(
+      req: http.IncomingMessage,
+      res: http.ServerResponse,
+      next: (error?: any) => void,
+    ): void {
+      if (options && options.flushTimeout && options.flushTimeout > 0) {
+        // eslint-disable-next-line @typescript-eslint/unbound-method
+        const _end = res.end;
+        res.end = function(chunk?: any | (() => void), encoding?: string | (() => void), cb?: () => void): void {
+          flush(options.flushTimeout)
+            .then(() => {
+              _end.call(this, chunk, encoding, cb);
+            })
+            .then(null, e => {
+              logger.error(e);
+            });
+        };
+      }
+      const local = domain.create();
+      local.add(req);
+      local.add(res);
+      local.on('error', next);
+      local.run(() => {
+        getCurrentHub().configureScope(scope =>
+          scope.addEventProcessor((event: Event) => parseRequest(event, req, options)),
+        );
+        next();
+      });
+    },
+    { sessionMode: 'request' },
+  );
 }
 
 /** JSDoc */
