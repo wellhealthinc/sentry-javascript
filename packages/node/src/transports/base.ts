@@ -113,7 +113,6 @@ export abstract class BaseTransport implements Transport {
     }
     return this._buffer.add(
       new Promise<Response>((resolve, reject) => {
-        // const sentryReq = eventToSentryRequest(event, this._api);
         const options = this._getRequestOptions(new url.URL(sentryReq.url));
 
         const req = httpModule.request(options, (res: http.IncomingMessage) => {
