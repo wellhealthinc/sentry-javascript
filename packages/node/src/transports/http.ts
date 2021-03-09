@@ -34,7 +34,6 @@ export class HTTPTransport extends BaseTransport {
     if (!this.module) {
       throw new SentryError('No module available in HTTPTransport');
     }
-    logger.log('Sending session!');
     return this._sendWithModule(this.module, sessionToSentryRequest(session, this._api));
   }
 }
