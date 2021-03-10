@@ -19,6 +19,7 @@ export interface Session extends SessionContext {
     started: string;
     duration: number;
     status: SessionStatus;
+    session_mode?: 'request' | 'application';
     errors: number;
     attrs?: {
       release?: string;
@@ -46,6 +47,7 @@ export interface SessionContext {
   ipAddress?: string;
   errors?: number;
   user?: User | null;
+  sessionMode?: 'request' | 'application';
 }
 
 /**
@@ -60,4 +62,14 @@ export enum SessionStatus {
   Crashed = 'crashed',
   /** JSDoc */
   Abnormal = 'abnormal',
+}
+
+/**
+ * Session Mode
+ */
+export enum SessionMode {
+  /** JSDoc */
+  Application = 'application',
+  /** JSDoc */
+  Request = 'request',
 }
