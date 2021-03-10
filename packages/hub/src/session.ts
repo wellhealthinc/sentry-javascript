@@ -1,4 +1,4 @@
-import { Session as SessionInterface, SessionContext, SessionStatus } from '@sentry/types';
+import { Session as SessionInterface, SessionContext, SessionMode, SessionStatus } from '@sentry/types';
 import { dropUndefinedKeys, uuid4 } from '@sentry/utils';
 
 /**
@@ -14,6 +14,7 @@ export class Session implements SessionInterface {
   public started: number = Date.now();
   public duration: number = 0;
   public status: SessionStatus = SessionStatus.Ok;
+  public sessionMode: SessionMode = SessionMode.Application;
   public environment?: string;
   public ipAddress?: string;
   public init: boolean = true;
@@ -75,6 +76,9 @@ export class Session implements SessionInterface {
     if (context.status) {
       this.status = context.status;
     }
+    if (context.sessionMode) {
+      this.sessionMode = context.sessionMode;
+    }
   }
 
   /** JSDoc */
@@ -97,6 +101,7 @@ export class Session implements SessionInterface {
     started: string;
     duration: number;
     status: SessionStatus;
+    session_mode: SessionMode;
     errors: number;
     attrs?: {
       release?: string;
@@ -111,6 +116,7 @@ export class Session implements SessionInterface {
       started: new Date(this.started).toISOString(),
       timestamp: new Date(this.timestamp).toISOString(),
       status: this.status,
+      session_mode: this.sessionMode,
       errors: this.errors,
       did: typeof this.did === 'number' || typeof this.did === 'string' ? `${this.did}` : undefined,
       duration: this.duration,
