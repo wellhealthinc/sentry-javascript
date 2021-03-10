@@ -19,7 +19,7 @@ export interface Session extends SessionContext {
     started: string;
     duration: number;
     status: SessionStatus;
-    session_mode?: 'request' | 'application';
+    session_mode?: SessionMode;
     errors: number;
     attrs?: {
       release?: string;
@@ -47,7 +47,7 @@ export interface SessionContext {
   ipAddress?: string;
   errors?: number;
   user?: User | null;
-  sessionMode?: 'request' | 'application';
+  sessionMode?: SessionMode;
 }
 
 /**
