@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { captureException, getCurrentHub, startTransaction, withScope } from '@sentry/core';
 import { extractTraceparentData, Span } from '@sentry/tracing';
-import { Event, ExtractedNodeRequestData, Transaction } from '@sentry/types';
+import { Event, ExtractedNodeRequestData, SessionMode, Transaction } from '@sentry/types';
 import { forget, isPlainObject, isString, logger, normalize, stripUrlQueryAndFragment } from '@sentry/utils';
 import * as cookie from 'cookie';
 import * as domain from 'domain';
@@ -405,7 +405,7 @@ export function requestHandler(
         next();
       });
     },
-    { sessionMode: 'request' },
+    { sessionMode: SessionMode.Request },
   );
 }
 
