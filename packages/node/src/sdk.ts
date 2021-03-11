@@ -169,10 +169,10 @@ export async function close(timeout?: number): Promise<boolean> {
 /**
  *
  */
-export function withAutosessionTracking(
-  callback: (...args: any[]) => void,
+export function withAutosessionTracking<T extends any[]>(
+  callback: (...args: T) => void,
   context?: SessionContext,
-): (...args: any[]) => void {
+): (...args: T) => void {
   logger.log('Auto session tracking context manager');
   return (...args) => {
     const hub = getCurrentHub();
