@@ -1,5 +1,7 @@
 import { BaseClient, Scope } from '@sentry/core';
-import { Event, EventHint } from '@sentry/types';
+import { Session, SessionFlusher } from '@sentry/hub';
+import { Event, EventHint, SessionMode } from '@sentry/types';
+import { logger } from '@sentry/utils';
 
 import { NodeBackend, NodeOptions } from './backend';
 
@@ -10,12 +12,37 @@ import { NodeBackend, NodeOptions } from './backend';
  * @see SentryClient for usage documentation.
  */
 export class NodeClient extends BaseClient<NodeBackend, NodeOptions> {
+  protected _sessionFlusher: SessionFlusher | undefined;
   /**
    * Creates a new Node SDK instance.
    * @param options Configuration options for this SDK.
    */
   public constructor(options: NodeOptions) {
     super(NodeBackend, options);
+    if (options.autoSessionTracking || options.autoSessionTracking === undefined) {
+      this._sessionFlusher = new SessionFlusher(this._backend.getTransport(), 10);
+    }
+  }
+  /**
+   * @inheritDoc
+   */
+  public captureSession(session: Session): void {
+    if (!session.release) {
+      logger.warn('Discarded session because of missing release');
+    } else {
+      if (session.sessionMode === SessionMode.Application) {
+        this._sendSession(session);
+        // After sending, we set init false to inidcate it's not the first occurence
+        session.update({ init: false });
+      } else {
+        if (!this._sessionFlusher) {
+          logger.warn('Discarded request mode session because autosessionTracking option was disabled');
+        } else {
+          this._sessionFlusher.addSession(session);
+          // ToDo check if session needs to be updated
+        }
+      }
+    }
   }
 
   /**
