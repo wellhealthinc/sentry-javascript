@@ -159,9 +159,6 @@ export class Session implements SessionInterface {
   }
 }
 
-type primaryKeyType = { [key: string]: secondaryKeyType };
-type secondaryKeyType = { [key: number]: AggregateSessionBucket };
-
 /** JSDoc */
 class SessionAttributes implements SessionAttributesInterface {
   public environment?: string;
@@ -212,7 +209,7 @@ class SessionAttributes implements SessionAttributesInterface {
  */
 export class SessionFlusher {
   public readonly maxItemsInEnvelope: number = 100;
-  private _pendingAggregates: primaryKeyType;
+  private _pendingAggregates: { [key: string]: { [key: number]: AggregateSessionBucket } };
   private _intervalId: any;
 
   constructor(private _transport: Transport, public readonly flushTimeout: number) {
