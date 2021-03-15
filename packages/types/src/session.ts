@@ -73,3 +73,35 @@ export enum SessionMode {
   /** JSDoc */
   Request = 'request',
 }
+
+// export interface SessionFlusher {}
+
+export interface AggregateSessionBucket {
+  started: string;
+  errored?: number;
+  exited?: number;
+  crashed?: number;
+  abnormal?: number;
+}
+
+/** JSDoc */
+export interface SessionAttributesContext {
+  environment?: string;
+  ipAddress?: string;
+  release?: string;
+  userAgent?: string;
+}
+
+/** JSDoc */
+export interface SessionAttributes extends SessionAttributesContext {
+  /** JSDoc */
+  update(context?: SessionAttributesContext): void;
+
+  /** JSDoc */
+  toJSON(): {
+    environment?: string;
+    ip_address?: string;
+    release?: string;
+    user_agent?: string;
+  };
+}
