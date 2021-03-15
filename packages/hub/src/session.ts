@@ -1,5 +1,14 @@
-import { Session as SessionInterface, SessionContext, SessionMode, SessionStatus } from '@sentry/types';
-import { dropUndefinedKeys, uuid4 } from '@sentry/utils';
+import {
+  AggregateSessionBucket,
+  Session as SessionInterface,
+  SessionAttributes as SessionAttributesInterface,
+  SessionAttributesContext,
+  SessionContext,
+  SessionMode,
+  SessionStatus,
+  Transport,
+} from '@sentry/types';
+import { dropUndefinedKeys, logger, uuid4 } from '@sentry/utils';
 
 /**
  * @inheritdoc
@@ -93,6 +102,26 @@ export class Session implements SessionInterface {
   }
 
   /** JSDoc */
+  getAggregateSessionAttrs(withUserInfo: boolean = true): SessionAttributesContext {
+    const attrs: SessionAttributesContext = {};
+    if (this.release !== undefined) {
+      attrs.release = this.release;
+    }
+    if (this.environment !== undefined) {
+      attrs.environment = this.environment;
+    }
+    if (withUserInfo) {
+      if (this.ipAddress !== undefined) {
+        attrs.ipAddress = this.ipAddress;
+      }
+      if (this.userAgent !== undefined) {
+        attrs.userAgent = this.userAgent;
+      }
+    }
+    return attrs;
+  }
+
+  /** JSDoc */
   toJSON(): {
     init: boolean;
     sid: string;
@@ -127,5 +156,120 @@ export class Session implements SessionInterface {
         user_agent: this.userAgent,
       }),
     });
+  }
+}
+
+type primaryKeyType = { [key: string]: secondaryKeyType };
+type secondaryKeyType = { [key: number]: AggregateSessionBucket };
+
+/** JSDoc */
+class SessionAttributes implements SessionAttributesInterface {
+  public environment?: string;
+  public ipAddress?: string;
+  public release?: string;
+  public userAgent?: string;
+
+  constructor(context?: SessionAttributesContext) {
+    if (context) {
+      this.update(context);
+    }
+  }
+
+  /** JSDoc */
+  update(context: SessionAttributesContext = {}): void {
+    if (context.environment !== undefined) {
+      this.environment = context.environment;
+    }
+    if (context.ipAddress !== undefined) {
+      this.ipAddress = context.ipAddress;
+    }
+    if (context.release !== undefined) {
+      this.release = context.release;
+    }
+    if (context.userAgent !== undefined) {
+      this.userAgent = context.userAgent;
+    }
+  }
+
+  /** JSDoc */
+  toJSON(): {
+    environment?: string;
+    ip_address?: string;
+    release?: string;
+    user_agent?: string;
+  } {
+    return dropUndefinedKeys({
+      environment: this.environment,
+      ip_address: this.ipAddress,
+      release: this.release,
+      user_agent: this.userAgent,
+    });
+  }
+}
+
+/**
+ * @inheritdoc
+ */
+export class SessionFlusher {
+  public readonly maxItemsInEnvelope: number = 100;
+  private _pendingAggregates: primaryKeyType;
+  private _intervalId: any;
+
+  constructor(private _transport: Transport, public readonly flushTimeout: number) {
+    this._pendingAggregates = {};
+    this._intervalId = setInterval(this.flush.bind(this), this.flushTimeout * 1000);
+  }
+
+  /** JSDoc */
+  public sendSession(session: Session): void {
+    if (!this._transport.sendSession) {
+      logger.warn("Dropping session because custom transport doesn't implement sendSession");
+      return;
+    }
+
+    this._transport.sendSession(session).then(null, reason => {
+      logger.error(`Error while sending session: ${reason}`);
+    });
+  }
+
+  /** JSDoc */
+  flush(): void {
+    logger.log(JSON.stringify(this._pendingAggregates));
+    logger.log('Called one time!');
+  }
+
+  /** JSDoc */
+  addSession(session: Session): void {
+    this._addAggregateSession(session);
+  }
+
+  /** JSDoc */
+  close(): void {
+    clearTimeout(this._intervalId);
+    this.flush();
+  }
+
+  /** JSDoc */
+  protected _addAggregateSession(session: Session): void {
+    const primaryKey: SessionAttributes = new SessionAttributes(session.getAggregateSessionAttrs(false));
+    const secondaryKey: number = new Date(session.started).setMinutes(0, 0, 0);
+    const jsonPrimaryKey = JSON.stringify(primaryKey);
+    this._pendingAggregates[jsonPrimaryKey] = this._pendingAggregates[jsonPrimaryKey] || {};
+    const states = this._pendingAggregates[jsonPrimaryKey];
+    states[secondaryKey] = states[secondaryKey] || {};
+    const state = states[secondaryKey];
+
+    if (!state.started) {
+      state.started = new Date(secondaryKey).toISOString();
+    }
+    if (session.status == SessionStatus.Crashed) {
+      state.crashed = state.crashed !== undefined ? state.crashed + 1 : 1;
+    } else if (session.status == SessionStatus.Abnormal) {
+      state.abnormal = state.abnormal !== undefined ? state.abnormal + 1 : 1;
+    } else if (session.errors > 0) {
+      state.errored = state.errored !== undefined ? state.errored + 1 : 1;
+    } else {
+      state.exited = state.exited !== undefined ? state.exited + 1 : 1;
+    }
   }
 }
