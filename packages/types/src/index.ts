@@ -29,6 +29,7 @@ export {
   AggregateSessionBucket,
   SessionAttributes,
   SessionAttributesContext,
+  SessionFlusher,
 } from './session';
 export { Severity } from './severity';
 export { Span, SpanContext } from './span';
