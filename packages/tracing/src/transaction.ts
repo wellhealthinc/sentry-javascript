@@ -42,7 +42,8 @@ export class Transaction extends SpanClass implements TransactionInterface {
 
     // create a new sentry tracestate value if we didn't inherit one
     if (!this.metadata.tracestate?.sentry) {
-      this.metadata.tracestate = { ...this.metadata.tracestate, sentry: this._getNewTracestate(this._hub) };
+      // this.metadata.tracestate = { ...this.metadata.tracestate, sentry: this._getNewTracestate(this._hub) };
+      // console.log('Lazily refusing to create missing tracestate at transaction creation time');
     }
 
     // this is because transactions are also spans, and spans have a transaction pointer
@@ -115,6 +116,12 @@ export class Transaction extends SpanClass implements TransactionInterface {
         }
         return prev;
       }).endTimestamp;
+    }
+
+    // ensure that we have a tracestate to attach to the envelope header
+    if (!this.metadata.tracestate?.sentry) {
+      console.log('Creating new tracestate just in time to capture the event (in transaction.finish())');
+      this.metadata.tracestate = { ...this.metadata.tracestate, sentry: this._getNewTracestate(this._hub) };
     }
 
     const transaction: Event = {

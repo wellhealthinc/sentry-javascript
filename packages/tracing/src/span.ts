@@ -1,6 +1,6 @@
 /* eslint-disable max-lines */
-import { getCurrentHub } from '@sentry/hub';
-import { Hub, Primitive, Span as SpanInterface, SpanContext, TraceHeaders, Transaction } from '@sentry/types';
+import { getCurrentHub, Hub } from '@sentry/hub';
+import { Primitive, Span as SpanInterface, SpanContext, TraceHeaders, Transaction } from '@sentry/types';
 import { dropUndefinedKeys, logger, timestampWithMs, uuid4 } from '@sentry/utils';
 
 import { SpanStatus } from './spanstatus';
@@ -359,6 +359,7 @@ export class Span implements SpanInterface {
    */
   protected _getNewTracestate(hub: Hub = getCurrentHub()): string | undefined {
     const client = hub.getClient();
+    const { id: userId, segment: userSegment } = hub.getScope()?.getUser() || {};
     const dsn = client?.getDsn();
 
     if (!client || !dsn) {
@@ -377,6 +378,8 @@ export class Span implements SpanInterface {
       release,
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       publicKey: dsn.publicKey!,
+      userId,
+      userSegment,
     })}`;
   }
 
@@ -395,8 +398,24 @@ export class Span implements SpanInterface {
    * Return a tracestate-compatible header string. Returns undefined if there is no client or no DSN.
    */
   private _toTracestate(): string | undefined {
-    const sentryTracestate = this.transaction?.metadata?.tracestate?.sentry || this._getNewTracestate();
-    let thirdpartyTracestate = this.transaction?.metadata?.tracestate?.thirdparty;
+    let sentryTracestate = this.transaction?.metadata.tracestate?.sentry;
+
+    if (!sentryTracestate) {
+      console.log('Creating new sentry tracestate in _toTracestate');
+      sentryTracestate = this._getNewTracestate();
+
+      // TODO kmclb will orphan spans still be a thing in v7?
+      // there should always be a transaction, unless this is an orphan span (which won't get sent, but which is still
+      // technically possible to create)
+      if (this.transaction) {
+        this.transaction.metadata.tracestate = {
+          ...this.transaction.metadata.tracestate,
+          sentry: sentryTracestate,
+        };
+      }
+    }
+
+    let thirdpartyTracestate = this.transaction?.metadata.tracestate?.thirdparty;
 
     // if there's third-party data, add a leading comma; otherwise, convert from `undefined` to the empty string, so the
     // end result doesn’t come out as `sentry=xxxxxundefined`
