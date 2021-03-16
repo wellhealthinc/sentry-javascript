@@ -20,7 +20,9 @@ export class NodeClient extends BaseClient<NodeBackend, NodeOptions> {
   public constructor(options: NodeOptions) {
     super(NodeBackend, options);
     if (options.autoSessionTracking || options.autoSessionTracking === undefined) {
-      this._sessionFlusher = new SessionFlusher(this._backend.getTransport(), 10);
+      // ToDo check if this would actually work prior to lazy intializing the transport and find better way to initialize
+      // flush timeout
+      this._sessionFlusher = new SessionFlusher(this._backend.getTransport());
     }
   }
   /**
