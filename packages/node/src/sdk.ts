@@ -184,7 +184,7 @@ export function withAutosessionTracking<T extends any[]>(
         callback(...args);
       } finally {
         logger.log('Capturing Sessoin');
-        hub.captureSession();
+        hub.endSession();
       }
     } else {
       callback(...args);
