@@ -4,6 +4,7 @@ import {
   SessionAttributes as SessionAttributesInterface,
   SessionAttributesContext,
   SessionContext,
+  SessionFlusher as SessionFlusherInterface,
   SessionMode,
   SessionStatus,
   Transport,
@@ -102,7 +103,7 @@ export class Session implements SessionInterface {
   }
 
   /** JSDoc */
-  getAggregateSessionAttrs(withUserInfo: boolean = true): SessionAttributesContext {
+  getSessionAttributes(withUserInfo: boolean = true): SessionAttributesContext {
     const attrs: SessionAttributesContext = {};
     if (this.release !== undefined) {
       attrs.release = this.release;
@@ -207,12 +208,12 @@ class SessionAttributes implements SessionAttributesInterface {
 /**
  * @inheritdoc
  */
-export class SessionFlusher {
+export class SessionFlusher implements SessionFlusherInterface {
   public readonly maxItemsInEnvelope: number = 100;
   private _pendingAggregates: { [key: string]: { [key: number]: AggregateSessionBucket } };
   private _intervalId: any;
 
-  constructor(private _transport: Transport, public readonly flushTimeout: number) {
+  constructor(private _transport: Transport, public readonly flushTimeout: number = 10) {
     this._pendingAggregates = {};
     this._intervalId = setInterval(this.flush.bind(this), this.flushTimeout * 1000);
   }
@@ -248,25 +249,39 @@ export class SessionFlusher {
 
   /** JSDoc */
   protected _addAggregateSession(session: Session): void {
-    const primaryKey: SessionAttributes = new SessionAttributes(session.getAggregateSessionAttrs(false));
-    const secondaryKey: number = new Date(session.started).setMinutes(0, 0, 0);
-    const jsonPrimaryKey = JSON.stringify(primaryKey);
-    this._pendingAggregates[jsonPrimaryKey] = this._pendingAggregates[jsonPrimaryKey] || {};
-    const states = this._pendingAggregates[jsonPrimaryKey];
-    states[secondaryKey] = states[secondaryKey] || {};
-    const state = states[secondaryKey];
+    // Fetch session attributes ("environment", "release") and JSONify them to use as key for pending aggregates buffer
+    const sessionAttrs: SessionAttributes = new SessionAttributes(session.getSessionAttributes(false));
+    const sessionAttrsJson = JSON.stringify(sessionAttrs);
 
-    if (!state.started) {
-      state.started = new Date(secondaryKey).toISOString();
+    // Truncate minutes and seconds on Session Started attribute to have one minute bucket keys
+    const sessionStartedTrunc: number = new Date(session.started).setMinutes(0, 0, 0);
+
+    this._pendingAggregates[sessionAttrsJson] = this._pendingAggregates[sessionAttrsJson] || {};
+
+    // Corresponds to all minute buckets that have not been flushed yet in a specific "environment" and "release"
+    // for example, {{"1615881600000":{"started":"2021-03-16T08:00:00.000Z","exited":4}}}
+    const sessionAttrsBuckets = this._pendingAggregates[sessionAttrsJson];
+    sessionAttrsBuckets[sessionStartedTrunc] = sessionAttrsBuckets[sessionStartedTrunc] || {};
+
+    // corresponds to aggregated sessions in one specific minute bucket
+    // for example, {"started":"2021-03-16T08:00:00.000Z","exited":4, "errored": 1}
+    const aggregateSessionsMinuteBucket = sessionAttrsBuckets[sessionStartedTrunc];
+
+    if (!aggregateSessionsMinuteBucket.started) {
+      aggregateSessionsMinuteBucket.started = new Date(sessionStartedTrunc).toISOString();
     }
     if (session.status == SessionStatus.Crashed) {
-      state.crashed = state.crashed !== undefined ? state.crashed + 1 : 1;
+      aggregateSessionsMinuteBucket.crashed =
+        aggregateSessionsMinuteBucket.crashed !== undefined ? aggregateSessionsMinuteBucket.crashed + 1 : 1;
     } else if (session.status == SessionStatus.Abnormal) {
-      state.abnormal = state.abnormal !== undefined ? state.abnormal + 1 : 1;
+      aggregateSessionsMinuteBucket.abnormal =
+        aggregateSessionsMinuteBucket.abnormal !== undefined ? aggregateSessionsMinuteBucket.abnormal + 1 : 1;
     } else if (session.errors > 0) {
-      state.errored = state.errored !== undefined ? state.errored + 1 : 1;
+      aggregateSessionsMinuteBucket.errored =
+        aggregateSessionsMinuteBucket.errored !== undefined ? aggregateSessionsMinuteBucket.errored + 1 : 1;
     } else {
-      state.exited = state.exited !== undefined ? state.exited + 1 : 1;
+      aggregateSessionsMinuteBucket.exited =
+        aggregateSessionsMinuteBucket.exited !== undefined ? aggregateSessionsMinuteBucket.exited + 1 : 1;
     }
   }
 }
