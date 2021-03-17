@@ -4,11 +4,6 @@ import { User } from './user';
  * @inheritdoc
  */
 export interface Session extends SessionContext {
-  /** @inheritdoc */
-  started: number;
-  /** @inheritdoc */
-  errors: number;
-
   getSessionAttributes(withUserInfo: boolean): SessionAttributes;
 
   /** JSDoc */
