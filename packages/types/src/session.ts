@@ -4,6 +4,13 @@ import { User } from './user';
  * @inheritdoc
  */
 export interface Session extends SessionContext {
+  /** @inheritdoc */
+  started: number;
+  /** @inheritdoc */
+  errors: number;
+
+  getSessionAttributes(withUserInfo: boolean): SessionAttributes;
+
   /** JSDoc */
   update(context?: SessionContext): void;
 
@@ -74,49 +81,10 @@ export enum SessionMode {
   Request = 'request',
 }
 
-export interface SessionFlusher {
-  readonly maxItemsInEnvelope: number;
-  readonly flushTimeout: number;
-
-  /** Aggregates the Session in its corresponding Aggregate Bucket */
-  addSession(session: Session): void;
-
-  /** Submits the session to Sentry */
-  sendSession(session: Session): void;
-
-  /** Empties Aggregate Buckets and Sends them to Transport Buffer */
-  flush(): void;
-
-  /** Clears setInterval and calls flush */
-  close(): void;
-}
-
-export interface AggregateSessionBucket {
-  started: string;
-  errored?: number;
-  exited?: number;
-  crashed?: number;
-  abnormal?: number;
-}
-
 /** JSDoc */
-export interface SessionAttributesContext {
+export interface SessionAttributes {
   environment?: string;
   ipAddress?: string;
   release?: string;
   userAgent?: string;
-}
-
-/** JSDoc */
-export interface SessionAttributes extends SessionAttributesContext {
-  /** JSDoc */
-  update(context?: SessionAttributesContext): void;
-
-  /** JSDoc */
-  toJSON(): {
-    environment?: string;
-    ip_address?: string;
-    release?: string;
-    user_agent?: string;
-  };
 }

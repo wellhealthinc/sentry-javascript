@@ -21,16 +21,8 @@ export { Runtime } from './runtime';
 export { CaptureContext, Scope, ScopeContext } from './scope';
 export { SdkInfo } from './sdkinfo';
 export { SdkMetadata } from './sdkmetadata';
-export {
-  Session,
-  SessionContext,
-  SessionStatus,
-  SessionMode,
-  AggregateSessionBucket,
-  SessionAttributes,
-  SessionAttributesContext,
-  SessionFlusher,
-} from './session';
+export { Session, SessionContext, SessionStatus, SessionMode, SessionAttributes } from './session';
+export { AggregatedSessions, AggregationCounts, SessionFlusher } from './sessionflusher';
 export { Severity } from './severity';
 export { Span, SpanContext } from './span';
 export { StackFrame } from './stackframe';
