@@ -1,7 +1,8 @@
 // eslint-disable-next-line deprecation/deprecation
 export { Carrier, DomainAsCarrier, Layer } from './interfaces';
 export { addGlobalEventProcessor, Scope } from './scope';
-export { Session, SessionFlusher } from './session';
+export { Session } from './session';
+export { SessionFlusher } from './sessionflusher';
 export {
   // eslint-disable-next-line deprecation/deprecation
   getActiveDomain,

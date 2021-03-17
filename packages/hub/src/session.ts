@@ -1,15 +1,11 @@
 import {
-  AggregateSessionBucket,
   Session as SessionInterface,
-  SessionAttributes as SessionAttributesInterface,
-  SessionAttributesContext,
+  SessionAttributes,
   SessionContext,
-  SessionFlusher as SessionFlusherInterface,
   SessionMode,
   SessionStatus,
-  Transport,
 } from '@sentry/types';
-import { dropUndefinedKeys, logger, uuid4 } from '@sentry/utils';
+import { dropUndefinedKeys, uuid4 } from '@sentry/utils';
 
 /**
  * @inheritdoc
@@ -103,8 +99,8 @@ export class Session implements SessionInterface {
   }
 
   /** JSDoc */
-  getSessionAttributes(withUserInfo: boolean = true): SessionAttributesContext {
-    const attrs: SessionAttributesContext = {};
+  getSessionAttributes(withUserInfo: boolean = true): SessionAttributes {
+    const attrs: SessionAttributes = {};
     if (this.release !== undefined) {
       attrs.release = this.release;
     }
@@ -157,131 +153,5 @@ export class Session implements SessionInterface {
         user_agent: this.userAgent,
       }),
     });
-  }
-}
-
-/** JSDoc */
-class SessionAttributes implements SessionAttributesInterface {
-  public environment?: string;
-  public ipAddress?: string;
-  public release?: string;
-  public userAgent?: string;
-
-  constructor(context?: SessionAttributesContext) {
-    if (context) {
-      this.update(context);
-    }
-  }
-
-  /** JSDoc */
-  update(context: SessionAttributesContext = {}): void {
-    if (context.environment !== undefined) {
-      this.environment = context.environment;
-    }
-    if (context.ipAddress !== undefined) {
-      this.ipAddress = context.ipAddress;
-    }
-    if (context.release !== undefined) {
-      this.release = context.release;
-    }
-    if (context.userAgent !== undefined) {
-      this.userAgent = context.userAgent;
-    }
-  }
-
-  /** JSDoc */
-  toJSON(): {
-    environment?: string;
-    ip_address?: string;
-    release?: string;
-    user_agent?: string;
-  } {
-    return dropUndefinedKeys({
-      environment: this.environment,
-      ip_address: this.ipAddress,
-      release: this.release,
-      user_agent: this.userAgent,
-    });
-  }
-}
-
-/**
- * @inheritdoc
- */
-export class SessionFlusher implements SessionFlusherInterface {
-  public readonly maxItemsInEnvelope: number = 100;
-  private _pendingAggregates: { [key: string]: { [key: number]: AggregateSessionBucket } };
-  private _intervalId: any;
-
-  constructor(private _transport: Transport, public readonly flushTimeout: number = 10) {
-    this._pendingAggregates = {};
-    this._intervalId = setInterval(this.flush.bind(this), this.flushTimeout * 1000);
-  }
-
-  /** JSDoc */
-  public sendSession(session: Session): void {
-    if (!this._transport.sendSession) {
-      logger.warn("Dropping session because custom transport doesn't implement sendSession");
-      return;
-    }
-
-    this._transport.sendSession(session).then(null, reason => {
-      logger.error(`Error while sending session: ${reason}`);
-    });
-  }
-
-  /** JSDoc */
-  flush(): void {
-    logger.log(JSON.stringify(this._pendingAggregates));
-    logger.log('Called one time!');
-  }
-
-  /** JSDoc */
-  addSession(session: Session): void {
-    this._addAggregateSession(session);
-  }
-
-  /** JSDoc */
-  close(): void {
-    clearTimeout(this._intervalId);
-    this.flush();
-  }
-
-  /** JSDoc */
-  protected _addAggregateSession(session: Session): void {
-    // Fetch session attributes ("environment", "release") and JSONify them to use as key for pending aggregates buffer
-    const sessionAttrs: SessionAttributes = new SessionAttributes(session.getSessionAttributes(false));
-    const sessionAttrsJson = JSON.stringify(sessionAttrs);
-
-    // Truncate minutes and seconds on Session Started attribute to have one minute bucket keys
-    const sessionStartedTrunc: number = new Date(session.started).setMinutes(0, 0, 0);
-
-    this._pendingAggregates[sessionAttrsJson] = this._pendingAggregates[sessionAttrsJson] || {};
-
-    // Corresponds to all minute buckets that have not been flushed yet in a specific "environment" and "release"
-    // for example, {{"1615881600000":{"started":"2021-03-16T08:00:00.000Z","exited":4}}}
-    const sessionAttrsBuckets = this._pendingAggregates[sessionAttrsJson];
-    sessionAttrsBuckets[sessionStartedTrunc] = sessionAttrsBuckets[sessionStartedTrunc] || {};
-
-    // corresponds to aggregated sessions in one specific minute bucket
-    // for example, {"started":"2021-03-16T08:00:00.000Z","exited":4, "errored": 1}
-    const aggregateSessionsMinuteBucket = sessionAttrsBuckets[sessionStartedTrunc];
-
-    if (!aggregateSessionsMinuteBucket.started) {
-      aggregateSessionsMinuteBucket.started = new Date(sessionStartedTrunc).toISOString();
-    }
-    if (session.status == SessionStatus.Crashed) {
-      aggregateSessionsMinuteBucket.crashed =
-        aggregateSessionsMinuteBucket.crashed !== undefined ? aggregateSessionsMinuteBucket.crashed + 1 : 1;
-    } else if (session.status == SessionStatus.Abnormal) {
-      aggregateSessionsMinuteBucket.abnormal =
-        aggregateSessionsMinuteBucket.abnormal !== undefined ? aggregateSessionsMinuteBucket.abnormal + 1 : 1;
-    } else if (session.errors > 0) {
-      aggregateSessionsMinuteBucket.errored =
-        aggregateSessionsMinuteBucket.errored !== undefined ? aggregateSessionsMinuteBucket.errored + 1 : 1;
-    } else {
-      aggregateSessionsMinuteBucket.exited =
-        aggregateSessionsMinuteBucket.exited !== undefined ? aggregateSessionsMinuteBucket.exited + 1 : 1;
-    }
   }
 }
