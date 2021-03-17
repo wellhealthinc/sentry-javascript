@@ -109,6 +109,10 @@ export function init(options: NodeOptions = {}): void {
     options.environment = process.env.SENTRY_ENVIRONMENT;
   }
 
+  if (options.autoSessionTracking === undefined) {
+    options.autoSessionTracking = true;
+  }
+
   options._metadata = options._metadata || {};
   options._metadata.sdk = {
     name: 'sentry.javascript.node',
@@ -195,12 +199,12 @@ export function withAutosessionTracking<T extends any[]>(
 /**
  *
  */
-export function isAutosessionTrackingEnabled(): boolean | undefined {
+export function isAutosessionTrackingEnabled(): boolean {
   // Also add the checks that makes sure in case when you stop session tracking or resume
   const client = getCurrentHub().getClient();
   const clientOptions: NodeOptions | null = client ? client.getOptions() : null;
   if (clientOptions && clientOptions.autoSessionTracking !== undefined) {
     return clientOptions.autoSessionTracking;
   }
-  return true;
+  return false;
 }
