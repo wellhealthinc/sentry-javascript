@@ -232,7 +232,6 @@ export class SessionFlusher implements SessionFlusherInterface {
     } else if (session.errors > 0) {
       aggregationCounts.errored = aggregationCounts.errored !== undefined ? aggregationCounts.errored + 1 : 1;
     } else {
-      logger.log(session.status);
       aggregationCounts.exited = aggregationCounts.exited !== undefined ? aggregationCounts.exited + 1 : 1;
     }
   }
