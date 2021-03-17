@@ -41,7 +41,6 @@ export class NodeClient extends BaseClient<NodeBackend, NodeOptions> {
           logger.warn('Discarded request mode session because autosessionTracking option was disabled');
         } else {
           this._sessionFlusher.addSession(session);
-          // ToDo check if session needs to be updated
         }
       }
     }

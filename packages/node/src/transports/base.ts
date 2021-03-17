@@ -1,5 +1,14 @@
 import { API, SDK_VERSION } from '@sentry/core';
-import { Event, Response, SentryRequest, Session, Status, Transport, TransportOptions } from '@sentry/types';
+import {
+  AggregatedSessions,
+  Event,
+  Response,
+  SentryRequest,
+  Session,
+  Status,
+  Transport,
+  TransportOptions,
+} from '@sentry/types';
 import { logger, parseRetryAfterHeader, PromiseBuffer, SentryError } from '@sentry/utils';
 import * as fs from 'fs';
 import * as http from 'http';
@@ -68,6 +77,13 @@ export abstract class BaseTransport implements Transport {
    */
   public sendSession(_: Session): PromiseLike<Response> {
     throw new SentryError('Transport Class has to implement `sendSession` method.');
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public sendSessions(_: AggregatedSessions): PromiseLike<Response> {
+    throw new SentryError('Transport Class has to implement `sendSessions` method.');
   }
 
   /**
