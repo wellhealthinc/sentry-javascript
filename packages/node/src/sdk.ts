@@ -184,10 +184,8 @@ export function withAutosessionTracking<T extends any[]>(
     if (isAutosessionTrackingEnabled()) {
       try {
         hub.startSession(context);
-        logger.log('Starting Session');
         callback(...args);
       } finally {
-        logger.log('Capturing Sessoin');
         hub.endSession();
       }
     } else {
