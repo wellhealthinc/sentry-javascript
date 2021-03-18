@@ -10,11 +10,12 @@ import {
 import { logger, parseRetryAfterHeader, PromiseBuffer, SentryError } from '@sentry/utils';
 
 const CATEGORY_MAPPING: {
-  [key in Exclude<SentryRequestType, 'sessions'>]: string;
+  [key in SentryRequestType]: string;
 } = {
   event: 'error',
   transaction: 'transaction',
   session: 'session',
+  sessions: 'sessions',
 };
 
 /** Base Transport class implementation */
