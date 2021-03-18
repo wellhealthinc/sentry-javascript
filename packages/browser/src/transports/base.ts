@@ -9,14 +9,13 @@ import {
 } from '@sentry/types';
 import { logger, parseRetryAfterHeader, PromiseBuffer, SentryError } from '@sentry/utils';
 
-type SentryBrowserRequestType = Exclude<SentryRequestType, 'sessions'>;
-
 const CATEGORY_MAPPING: {
-  [key in SentryBrowserRequestType]: string;
+  [key in SentryRequestType]: string;
 } = {
   event: 'error',
   transaction: 'transaction',
   session: 'session',
+  sessions: 'sessions',
 };
 
 /** Base Transport class implementation */
@@ -65,7 +64,7 @@ export abstract class BaseTransport implements Transport {
     resolve,
     reject,
   }: {
-    requestType: SentryBrowserRequestType;
+    requestType: SentryRequestType;
     response: Response | XMLHttpRequest;
     headers: Record<string, string | null>;
     resolve: (value?: SentryResponse | PromiseLike<SentryResponse> | null | undefined) => void;
@@ -90,7 +89,7 @@ export abstract class BaseTransport implements Transport {
   /**
    * Gets the time that given category is disabled until for rate limiting
    */
-  protected _disabledUntil(requestType: SentryBrowserRequestType): Date {
+  protected _disabledUntil(requestType: SentryRequestType): Date {
     const category = CATEGORY_MAPPING[requestType];
     return this._rateLimits[category] || this._rateLimits.all;
   }
@@ -98,7 +97,7 @@ export abstract class BaseTransport implements Transport {
   /**
    * Checks if a category is rate limited
    */
-  protected _isRateLimited(requestType: SentryBrowserRequestType): boolean {
+  protected _isRateLimited(requestType: SentryRequestType): boolean {
     return this._disabledUntil(requestType) > new Date(Date.now());
   }
 
