@@ -1,7 +1,7 @@
 import { getCurrentHub, initAndBind, Integrations as CoreIntegrations, SDK_VERSION } from '@sentry/core';
 import { getMainCarrier, setHubOnCarrier } from '@sentry/hub';
 import { SessionContext } from '@sentry/types';
-import { getGlobalObject, logger } from '@sentry/utils';
+import { getGlobalObject } from '@sentry/utils';
 import * as domain from 'domain';
 
 import { NodeOptions } from './backend';
@@ -177,7 +177,6 @@ export function withAutosessionTracking<T extends any[]>(
   callback: (...args: T) => void,
   context?: SessionContext,
 ): (...args: T) => void {
-  logger.log('Auto session tracking context manager');
   return (...args) => {
     const hub = getCurrentHub();
     // Check that start session is on hub
