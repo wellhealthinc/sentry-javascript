@@ -1,7 +1,6 @@
 import * as domain from 'domain';
 
 import { getCarrier } from '@sentry/minimal';
-import { getCurrentHub, getMainCarrier, setHubOnCarrier } from '@sentry/hub';
 import { getGlobalObject } from '@sentry/utils';
 import { InboundFilters } from '@sentry/integration-common-inboundfilters';
 import { LinkedErrors } from '@sentry/integration-node-linkederrors';
@@ -106,12 +105,9 @@ export function init(options: NodeOptions = {}): void {
     options.environment = process.env.SENTRY_ENVIRONMENT;
   }
 
+  // TODO: Reevaluate whether stickin it on the domain is still necessary
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-  if ((domain as any).active) {
-    setHubOnCarrier(getMainCarrier(), getCurrentHub());
-  }
-
-  const carrier = getCarrier();
+  const carrier = (domain as any).active ? getCarrier((domain as any).active) : getCarrier();
   const client = new NodeClient(options);
   carrier.client = client;
   // TODO: Should we return client here instead of void?

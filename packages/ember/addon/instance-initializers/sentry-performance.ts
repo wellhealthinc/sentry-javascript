@@ -346,8 +346,7 @@ export async function instrumentForPerformance(appInstance: ApplicationInstance)
     }),
   ];
 
-  if (isTesting() && Sentry.getCurrentHub()?.getIntegration(tracing.Integrations.BrowserTracing)) {
-    // Initializers are called more than once in tests, causing the integrations to not be setup correctly.
+  if (isTesting()) {
     return;
   }
 

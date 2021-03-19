@@ -4,9 +4,8 @@ import * as http from 'http';
 import * as os from 'os';
 import * as url from 'url';
 
-import { getCurrentHub } from '@sentry/hub';
-import { captureException, flush, startTransaction, withScope } from '@sentry/minimal';
-import { extractTraceparentData, Span } from '@sentry/tracing';
+import { captureException, flush, getCurrentClient, withScope } from '@sentry/minimal';
+import { extractTraceparentData, Span, startTransaction } from '@sentry/tracing';
 import { SentryEvent, ExtractedNodeRequestData, Transaction } from '@sentry/types';
 import { isPlainObject, isString, logger, normalize, stripUrlQueryAndFragment } from '@sentry/utils';
 import * as cookie from 'cookie';
@@ -67,9 +66,9 @@ export function tracingHandler(): (
     );
 
     // We put the transaction on the scope so users can attach children to it
-    getCurrentHub().configureScope(scope => {
-      scope.setSpan(transaction);
-    });
+    getCurrentClient()
+      ?.getScope()
+      ?.setSpan(transaction);
 
     // We also set __sentry_transaction on the response so people can grab the transaction there to add
     // spans to it later.
@@ -390,9 +389,11 @@ export function requestHandler(
     local.add(res);
     local.on('error', next);
     local.run(() => {
-      getCurrentHub().configureScope(scope =>
-        scope.addEventProcessor((event: SentryEvent) => parseRequest(event, req, options)),
-      );
+      // We put the transaction on the scope so users can attach children to it
+      getCurrentClient()
+        ?.getScope()
+        ?.addEventProcessor((event: SentryEvent) => parseRequest(event, req, options));
+
       next();
     });
   };

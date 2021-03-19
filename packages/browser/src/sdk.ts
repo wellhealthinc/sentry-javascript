@@ -1,6 +1,5 @@
 import { ClientLike } from '@sentry/types';
 import { captureException, getCarrier, getCurrentClient } from '@sentry/minimal';
-import { getCurrentHub } from '@sentry/hub';
 import { addInstrumentationHandler, getGlobalObject, logger } from '@sentry/utils';
 import { ReportDialogOptions } from '@sentry/transport-base';
 import { InboundFilters } from '@sentry/integration-common-inboundfilters';

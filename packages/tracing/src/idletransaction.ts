@@ -1,4 +1,3 @@
-import { Hub } from '@sentry/hub';
 import { getTransaction, setSpan } from '@sentry/minimal';
 import { ClientLike, TransactionContext } from '@sentry/types';
 import { logger, timestampWithMs } from '@sentry/utils';

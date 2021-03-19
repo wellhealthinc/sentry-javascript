@@ -1,8 +1,7 @@
-import { Hub } from '@sentry/hub';
-import { EventProcessor, Integration, Transaction, TransactionContext } from '@sentry/types';
+import { ClientLike, IntegrationV7, Transaction, TransactionContext } from '@sentry/types';
 import { getGlobalObject, logger } from '@sentry/utils';
 
-import { startIdleTransaction } from '../hubextensions';
+import { startIdleTransaction } from '../start';
 import { DEFAULT_IDLE_TIMEOUT, IdleTransaction } from '../idletransaction';
 import { SpanStatus } from '../spanstatus';
 import { extractTraceparentData, secToMs } from '../utils';

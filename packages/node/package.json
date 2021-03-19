@@ -17,7 +17,6 @@
   },
   "dependencies": {
     "@sentry/core": "6.2.3",
-    "@sentry/hub": "6.2.3",
     "@sentry/eventbuilder-node": "7.0.0-alpha.0",
     "@sentry/integration-common-inboundfilters": "7.0.0-alpha.0",
     "@sentry/integration-node-breadcrumbs": "7.0.0-alpha.0",

@@ -1,5 +1,4 @@
 export { Scope } from '@sentry/scope';
-export { getHubFromCarrier, getCurrentHub, Hub, makeMain } from '@sentry/hub';
 export {
   addGlobalEventProcessor,
   addBreadcrumb,

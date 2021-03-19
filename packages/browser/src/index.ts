@@ -1,6 +1,5 @@
 export { Scope } from '@sentry/scope';
-export { getHubFromCarrier, getCurrentHub, Hub, makeMain } from '@sentry/hub';
-export { configureScope, startTransaction, withScope } from '@sentry/minimal';
+export { configureScope, withScope } from '@sentry/minimal';
 export { SDK_VERSION } from '@sentry/core';
 export {
   addBreadcrumb,

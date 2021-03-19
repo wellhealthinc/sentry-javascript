@@ -1,5 +1,4 @@
-import { getCurrentHub } from '@sentry/hub';
-import { CustomSamplingContext, ScopeLike, Transaction, TransactionContext } from '@sentry/types';
+import { ScopeLike } from '@sentry/types';
 
 import { getCurrentClient } from './carrier';
 

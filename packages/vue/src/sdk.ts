@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { BrowserOptions, getCurrentHub, init as browserInit, SDK_VERSION } from '@sentry/browser';
-import { getTransaction } from '@sentry/minimal';
+import { BrowserOptions, init as browserInit, SDK_VERSION } from '@sentry/browser';
+import { captureException, getTransaction } from '@sentry/minimal';
 import { Span } from '@sentry/types';
 import { basename, getGlobalObject, logger, timestampWithMs } from '@sentry/utils';
 
@@ -384,9 +384,12 @@ class VueHelper {
 
       // Capture exception in the next event loop, to make sure that all breadcrumbs are recorded in time.
       setTimeout(() => {
-        getCurrentHub().withScope(scope => {
-          scope.setContext('vue', metadata);
-          getCurrentHub().captureException(error);
+        captureException(error, {
+          scope: {
+            contexts: {
+              vue: metadata,
+            },
+          },
         });
       });
 
