@@ -1,4 +1,4 @@
-import { WrappedFunction, IntegrationV7 } from '@sentry/types';
+import { WrappedFunction, Integration } from '@sentry/types';
 import { fill, getFunctionName, getGlobalObject } from '@sentry/utils';
 
 import { wrap } from './wrap';
@@ -36,7 +36,7 @@ const EVENT_TARGETS = [
   'XMLHttpRequestUpload',
 ] as const;
 
-export class EventTargetWrap implements IntegrationV7 {
+export class EventTargetWrap implements Integration {
   public name = this.constructor.name;
 
   private _targets: Target[];

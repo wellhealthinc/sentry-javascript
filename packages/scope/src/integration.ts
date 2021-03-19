@@ -1,7 +1,7 @@
-import { ClientLike, IntegrationV7 } from '@sentry/types';
+import { ClientLike, Integration } from '@sentry/types';
 import { getCurrentScope } from '@sentry/minimal';
 
-export class ScopeIntegration implements IntegrationV7 {
+export class ScopeIntegration implements Integration {
   public name = this.constructor.name;
 
   /**

@@ -1,4 +1,4 @@
-import { ClientLike, IntegrationV7, SpanContext } from '@sentry/types';
+import { ClientLike, Integration, SpanContext } from '@sentry/types';
 import { dynamicRequire, fill, isThenable, logger } from '@sentry/utils';
 
 // This allows us to use the same array for both defaults options and the type itself.
@@ -88,7 +88,7 @@ interface MongoOptions {
 }
 
 /** Tracing integration for mongo package */
-export class Mongo implements IntegrationV7 {
+export class Mongo implements Integration {
   public name = this.constructor.name;
 
   private _client!: ClientLike;

@@ -1,6 +1,6 @@
-import { SentryEvent, Exception, ClientLike, IntegrationV7, StackFrame } from '@sentry/types';
+import { SentryEvent, Exception, ClientLike, Integration, StackFrame } from '@sentry/types';
 
-export class Dedupe implements IntegrationV7 {
+export class Dedupe implements Integration {
   public name = this.constructor.name;
 
   private _previousEvent?: SentryEvent;

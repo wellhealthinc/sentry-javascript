@@ -1,4 +1,4 @@
-import { ClientLike, SentryEvent, IntegrationV7 } from '@sentry/types';
+import { ClientLike, SentryEvent, Integration } from '@sentry/types';
 import { getEventDescription, isMatchingPattern, logger } from '@sentry/utils';
 
 // "Script error." is hard coded into browsers for errors that it can't read.
@@ -13,7 +13,7 @@ interface InboundFiltersOptions {
 }
 
 /** Inbound filters configurable by the user */
-export class InboundFilters implements IntegrationV7 {
+export class InboundFilters implements Integration {
   public name = this.constructor.name;
 
   public constructor(private readonly _options: Partial<InboundFiltersOptions> = {}) {}

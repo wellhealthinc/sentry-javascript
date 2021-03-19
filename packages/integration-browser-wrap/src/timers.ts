@@ -1,4 +1,4 @@
-import { IntegrationV7 } from '@sentry/types';
+import { Integration } from '@sentry/types';
 import { fill, getFunctionName, getGlobalObject } from '@sentry/utils';
 
 import { wrap } from './wrap';
@@ -9,7 +9,7 @@ type TimersWrapOptions = {
   requestAnimationFrame?: boolean;
 };
 
-export class TimersWrap implements IntegrationV7 {
+export class TimersWrap implements Integration {
   public name = this.constructor.name;
 
   private _setTimeout: boolean;

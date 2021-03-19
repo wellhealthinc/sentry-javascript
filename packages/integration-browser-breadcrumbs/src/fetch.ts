@@ -1,7 +1,7 @@
-import { Breadcrumb, BreadcrumbHint, ClientLike, IntegrationV7, Severity } from '@sentry/types';
+import { Breadcrumb, BreadcrumbHint, ClientLike, Integration, Severity } from '@sentry/types';
 import { addInstrumentationHandler } from '@sentry/utils';
 
-export class FetchBreadcrumbs implements IntegrationV7 {
+export class FetchBreadcrumbs implements Integration {
   public name = this.constructor.name;
 
   public install(client: ClientLike): void {

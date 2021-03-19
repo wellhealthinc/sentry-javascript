@@ -1,9 +1,9 @@
 import * as util from 'util';
 
-import { ClientLike, IntegrationV7, Severity } from '@sentry/types';
+import { ClientLike, Integration, Severity } from '@sentry/types';
 import { fill } from '@sentry/utils';
 
-export class ConsoleBreadcrumbs implements IntegrationV7 {
+export class ConsoleBreadcrumbs implements Integration {
   public name = this.constructor.name;
 
   private _client!: ClientLike;

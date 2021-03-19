@@ -1,4 +1,4 @@
-import { ClientLike, IntegrationV7, ScopeContext } from '@sentry/types';
+import { ClientLike, Integration, ScopeContext } from '@sentry/types';
 import { getGlobalObject, supportsReportingObserver } from '@sentry/utils';
 
 type Report = {
@@ -45,7 +45,7 @@ type ReportingObserverOptions = {
   types?: ReportTypes[];
 };
 
-export class ReportingObserver implements IntegrationV7 {
+export class ReportingObserver implements Integration {
   public name = this.constructor.name;
 
   public constructor(

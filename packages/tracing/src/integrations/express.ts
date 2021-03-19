@@ -1,4 +1,4 @@
-import { ClientLike, IntegrationV7, Transaction } from '@sentry/types';
+import { ClientLike, Integration, Transaction } from '@sentry/types';
 import { logger } from '@sentry/utils';
 
 type Method =
@@ -49,7 +49,7 @@ interface SentryTracingResponse {
  *
  * Provides an request and error handler for Express framework as well as tracing capabilities
  */
-export class Express implements IntegrationV7 {
+export class Express implements Integration {
   public name = this.constructor.name;
 
   /**

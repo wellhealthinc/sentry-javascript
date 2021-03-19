@@ -1,11 +1,11 @@
-import { WrappedFunction, IntegrationV7 } from '@sentry/types';
+import { WrappedFunction, Integration } from '@sentry/types';
 import { fill, getFunctionName, getGlobalObject } from '@sentry/utils';
 
 import { wrap } from './wrap';
 
 type XMLHttpRequestProp = 'onload' | 'onerror' | 'onprogress' | 'onreadystatechange';
 
-export class XHRWrap implements IntegrationV7 {
+export class XHRWrap implements Integration {
   public name = this.constructor.name;
 
   public install(): void {

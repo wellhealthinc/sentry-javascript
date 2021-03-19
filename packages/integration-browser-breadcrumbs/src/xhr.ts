@@ -1,7 +1,7 @@
-import { ClientLike, IntegrationV7 } from '@sentry/types';
+import { ClientLike, Integration } from '@sentry/types';
 import { addInstrumentationHandler } from '@sentry/utils';
 
-export class XHRBreadcrumbs implements IntegrationV7 {
+export class XHRBreadcrumbs implements Integration {
   public name = this.constructor.name;
 
   public install(client: ClientLike): void {

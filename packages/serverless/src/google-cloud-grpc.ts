@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 
-import { ClientLike, IntegrationV7, Span } from '@sentry/types';
+import { ClientLike, Integration, Span } from '@sentry/types';
 import { fill } from '@sentry/utils';
 import { getTransaction } from '@sentry/minimal';
 
@@ -27,7 +27,7 @@ interface Stub {
 }
 
 /** Google Cloud Platform service requests tracking for GRPC APIs */
-export class GoogleCloudGrpc implements IntegrationV7 {
+export class GoogleCloudGrpc implements Integration {
   public name = this.constructor.name;
 
   private readonly _optional: boolean;

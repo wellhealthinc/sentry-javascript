@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'fs';
 import { dirname, join } from 'path';
 
-import { ClientLike, IntegrationV7 } from '@sentry/types';
+import { ClientLike, Integration } from '@sentry/types';
 
 /** Extract information about paths */
 function getPaths(): string[] {
@@ -65,7 +65,7 @@ function collectModules(): {
 }
 
 /** Add node modules / packages to the event */
-export class Modules implements IntegrationV7 {
+export class Modules implements Integration {
   public name = this.constructor.name;
 
   private _moduleCache?: { [key: string]: string };

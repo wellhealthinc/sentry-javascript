@@ -1,7 +1,7 @@
-import { ClientLike, IntegrationV7 } from '@sentry/types';
+import { ClientLike, Integration } from '@sentry/types';
 import { addInstrumentationHandler, htmlTreeAsString } from '@sentry/utils';
 
-export class DOMBreadcrumbs implements IntegrationV7 {
+export class DOMBreadcrumbs implements Integration {
   public name = this.constructor.name;
 
   public install(client: ClientLike): void {

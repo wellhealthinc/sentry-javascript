@@ -1,5 +1,5 @@
 import { getTransaction } from '@sentry/minimal';
-import { ClientLike, IntegrationV7, Span } from '@sentry/types';
+import { ClientLike, Integration, Span } from '@sentry/types';
 import { fill } from '@sentry/utils';
 // 'aws-sdk/global' import is expected to be type-only so it's erased in the final .js file.
 // When TypeScript compiler is upgraded, use `import type` syntax to explicitly assert that we don't want to load a module here.
@@ -16,7 +16,7 @@ interface AWSService {
 }
 
 /** AWS service requests tracking */
-export class AWSServices implements IntegrationV7 {
+export class AWSServices implements Integration {
   public name = this.constructor.name;
 
   private readonly _optional: boolean;

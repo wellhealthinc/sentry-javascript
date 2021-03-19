@@ -1,4 +1,4 @@
-import { ClientLike, IntegrationV7 } from '@sentry/types';
+import { ClientLike, Integration } from '@sentry/types';
 import { dynamicRequire, fill, logger } from '@sentry/utils';
 
 interface MysqlConnection {
@@ -8,7 +8,7 @@ interface MysqlConnection {
 }
 
 /** Tracing integration for node-mysql package */
-export class Mysql implements IntegrationV7 {
+export class Mysql implements Integration {
   public name = this.constructor.name;
 
   public install(client: ClientLike): void {

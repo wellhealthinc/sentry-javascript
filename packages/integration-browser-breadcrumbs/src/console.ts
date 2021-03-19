@@ -1,7 +1,7 @@
-import { ClientLike, IntegrationV7, Severity } from '@sentry/types';
+import { ClientLike, Integration, Severity } from '@sentry/types';
 import { addInstrumentationHandler, safeJoin } from '@sentry/utils';
 
-export class ConsoleBreadcrumbs implements IntegrationV7 {
+export class ConsoleBreadcrumbs implements Integration {
   public name = this.constructor.name;
 
   public install(client: ClientLike): void {

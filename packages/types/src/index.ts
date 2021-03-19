@@ -10,7 +10,7 @@ export { EventProcessor } from './eventprocessor';
 export { Exception } from './exception';
 export { Extra, Extras } from './extra';
 export { Hub } from './hub';
-export { IntegrationV7 } from './integration';
+export { Integration } from './integration';
 export { LogLevel } from './loglevel';
 export { Mechanism } from './mechanism';
 export { ExtractedNodeRequestData, Primitive, SentryGlobal, WorkerLocation } from './misc';

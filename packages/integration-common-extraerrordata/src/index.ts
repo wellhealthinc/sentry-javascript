@@ -1,11 +1,11 @@
-import { SentryEvent, EventHint, ExtendedError, ClientLike, IntegrationV7 } from '@sentry/types';
+import { SentryEvent, EventHint, ExtendedError, ClientLike, Integration } from '@sentry/types';
 import { isError, isPlainObject, logger, normalize } from '@sentry/utils';
 
 interface ExtraErrorDataOptions {
   depth?: number;
 }
 
-export class ExtraErrorData implements IntegrationV7 {
+export class ExtraErrorData implements Integration {
   public name = this.constructor.name;
 
   public constructor(private readonly _options: ExtraErrorDataOptions = { depth: 3 }) {}

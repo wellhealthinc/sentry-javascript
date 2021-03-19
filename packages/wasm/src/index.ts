@@ -1,4 +1,4 @@
-import { SentryEvent, StackFrame, IntegrationV7, ClientLike } from '@sentry/types';
+import { SentryEvent, StackFrame, Integration, ClientLike } from '@sentry/types';
 
 import { patchWebAssembly } from './patchWebAssembly';
 import { getImage, getImages } from './registry';
@@ -33,7 +33,7 @@ function patchFrames(frames: Array<StackFrame>): boolean {
  * This also hooks the WebAssembly loading browser API so that module
  * registraitons are intercepted.
  */
-export class Wasm implements IntegrationV7 {
+export class Wasm implements Integration {
   public name = this.constructor.name;
 
   /**

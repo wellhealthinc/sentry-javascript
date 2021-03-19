@@ -1,11 +1,11 @@
-import { ClientLike, EventHint, Exception, ExtendedError, IntegrationV7, SentryEvent } from '@sentry/types';
+import { ClientLike, EventHint, Exception, ExtendedError, Integration, SentryEvent } from '@sentry/types';
 import { isInstanceOf, SyncPromise } from '@sentry/utils';
 import { getExceptionFromError } from '@sentry/eventbuilder-node';
 
 const DEFAULT_KEY = 'cause';
 const DEFAULT_LIMIT = 5;
 
-export class LinkedErrors implements IntegrationV7 {
+export class LinkedErrors implements Integration {
   public name = this.constructor.name;
 
   private readonly _key: string;

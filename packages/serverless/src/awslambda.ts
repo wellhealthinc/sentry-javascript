@@ -7,7 +7,7 @@ import { types } from 'util';
 import { captureException, captureMessage, flush } from '@sentry/node';
 import * as Sentry from '@sentry/node';
 import { extractTraceparentData, startTransaction } from '@sentry/tracing';
-import { IntegrationV7, ScopeLike, Severity } from '@sentry/types';
+import { Integration, ScopeLike, Severity } from '@sentry/types';
 import { isString, logger } from '@sentry/utils';
 import { getCurrentClient } from '@sentry/minimal';
 // NOTE: I have no idea how to fix this right now, and don't want to waste more time, as it builds just fine — Kamil
@@ -41,10 +41,7 @@ export interface WrapperOptions {
   timeoutWarningLimit: number;
 }
 
-export const defaultIntegrations: IntegrationV7[] = [
-  ...Sentry.defaultIntegrations,
-  new AWSServices({ optional: true }),
-];
+export const defaultIntegrations: Integration[] = [...Sentry.defaultIntegrations, new AWSServices({ optional: true })];
 
 /**
  * @see {@link Sentry.init}

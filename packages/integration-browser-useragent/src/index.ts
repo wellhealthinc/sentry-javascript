@@ -1,7 +1,7 @@
-import { ClientLike, SentryEvent, IntegrationV7 } from '@sentry/types';
+import { ClientLike, SentryEvent, Integration } from '@sentry/types';
 import { getGlobalObject } from '@sentry/utils';
 
-export class UserAgent implements IntegrationV7 {
+export class UserAgent implements Integration {
   public name = this.constructor.name;
 
   public install(client: ClientLike): void {

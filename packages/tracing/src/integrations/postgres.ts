@@ -1,4 +1,4 @@
-import { ClientLike, IntegrationV7 } from '@sentry/types';
+import { ClientLike, Integration } from '@sentry/types';
 import { dynamicRequire, fill, logger } from '@sentry/utils';
 
 interface PgClient {
@@ -8,7 +8,7 @@ interface PgClient {
 }
 
 /** Tracing integration for node-postgres package */
-export class Postgres implements IntegrationV7 {
+export class Postgres implements Integration {
   public name = this.constructor.name;
 
   public install(client: ClientLike): void {

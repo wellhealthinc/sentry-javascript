@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { SentryEvent, ClientLike, IntegrationV7 } from '@sentry/types';
+import { SentryEvent, ClientLike, Integration } from '@sentry/types';
 import { getGlobalObject, logger, normalize, uuid4 } from '@sentry/utils';
+
 import * as localForageType from 'localforage';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -10,7 +10,7 @@ type OfflineOptions = {
   maxStoredEvents?: number;
 };
 
-export class Offline implements IntegrationV7 {
+export class Offline implements Integration {
   public name = this.constructor.name;
 
   /**

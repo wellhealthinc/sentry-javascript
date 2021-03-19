@@ -1,6 +1,6 @@
-import { ClientLike, IntegrationV7, SentryEvent } from '@sentry/types';
+import { ClientLike, Integration, SentryEvent } from '@sentry/types';
 
-export class SessionTiming implements IntegrationV7 {
+export class SessionTiming implements Integration {
   public name = this.constructor.name;
 
   protected readonly _startTime: number = Date.now();

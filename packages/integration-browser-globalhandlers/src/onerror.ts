@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { ClientLike, SentryEvent, IntegrationV7 } from '@sentry/types';
+import { ClientLike, SentryEvent, Integration } from '@sentry/types';
 import {
   addExceptionMechanism,
   addInstrumentationHandler,
@@ -11,7 +11,7 @@ import {
 } from '@sentry/utils';
 import { eventFromUnknownInput } from '@sentry/eventbuilder-browser';
 
-export class OnError implements IntegrationV7 {
+export class OnError implements Integration {
   public name = this.constructor.name;
 
   public install(client: ClientLike): void {

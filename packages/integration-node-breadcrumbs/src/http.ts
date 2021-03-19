@@ -3,13 +3,13 @@ import * as http from 'http';
 import { URL } from 'url';
 
 import { getSpan } from '@sentry/minimal';
-import { ClientLike, IntegrationV7, Span } from '@sentry/types';
+import { ClientLike, Integration, Span } from '@sentry/types';
 import { fill, logger, parseSemver } from '@sentry/utils';
 
 const NODE_VERSION = parseSemver(process.versions.node);
 
 // TODO: Tracing shouldnt live in the breadcrumbs, it has to be extracted.
-export class HTTPBreadcrumbs implements IntegrationV7 {
+export class HTTPBreadcrumbs implements Integration {
   public name = this.constructor.name;
 
   private _client!: ClientLike;

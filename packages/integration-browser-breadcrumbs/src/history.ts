@@ -1,7 +1,7 @@
-import { ClientLike, IntegrationV7 } from '@sentry/types';
+import { ClientLike, Integration } from '@sentry/types';
 import { addInstrumentationHandler, getGlobalObject, parseUrl } from '@sentry/utils';
 
-export class HistoryBreadcrumbs implements IntegrationV7 {
+export class HistoryBreadcrumbs implements Integration {
   public name = this.constructor.name;
 
   public install(client: ClientLike): void {

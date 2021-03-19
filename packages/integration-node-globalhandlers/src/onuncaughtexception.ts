@@ -1,4 +1,4 @@
-import { ClientLike, IntegrationV7, Severity } from '@sentry/types';
+import { ClientLike, Integration, Severity } from '@sentry/types';
 import { logger } from '@sentry/utils';
 
 import { logAndExitProcess } from './exit';
@@ -8,7 +8,7 @@ type OnUncaughtExceptionOptions = {
   onFatalError?: onFatalErrorHandler;
 };
 
-export class OnUncaughtException implements IntegrationV7 {
+export class OnUncaughtException implements Integration {
   public name = this.constructor.name;
 
   public constructor(private _options: OnUncaughtExceptionOptions = {}) {}

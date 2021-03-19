@@ -2,7 +2,7 @@
 // When TypeScript compiler is upgraded, use `import type` syntax to explicitly assert that we don't want to load a module here.
 import * as common from '@google-cloud/common';
 import { getTransaction } from '@sentry/minimal';
-import { ClientLike, IntegrationV7, Span } from '@sentry/types';
+import { ClientLike, Integration, Span } from '@sentry/types';
 import { fill } from '@sentry/utils';
 
 type RequestOptions = common.DecorateRequestOptions;
@@ -13,7 +13,7 @@ interface RequestFunction extends CallableFunction {
 }
 
 /** Google Cloud Platform service requests tracking for RESTful APIs */
-export class GoogleCloudHttp implements IntegrationV7 {
+export class GoogleCloudHttp implements Integration {
   public name = this.constructor.name;
 
   private readonly _optional: boolean;

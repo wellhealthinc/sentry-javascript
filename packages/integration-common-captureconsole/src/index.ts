@@ -1,4 +1,4 @@
-import { ClientLike, IntegrationV7, ScopeContext, Severity } from '@sentry/types';
+import { ClientLike, Integration, ScopeContext, Severity } from '@sentry/types';
 import { fill, getGlobalObject, safeJoin } from '@sentry/utils';
 
 type Level = typeof LEVELS[number];
@@ -8,7 +8,7 @@ type CaptoreConsoleOptions = {
   levels?: Level[];
 };
 
-export class CaptureConsole implements IntegrationV7 {
+export class CaptureConsole implements Integration {
   public name = this.constructor.name;
 
   private _levels: Level[];

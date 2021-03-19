@@ -1,18 +1,18 @@
-import { ClientLike, IntegrationV7, OptionsV7 } from '@sentry/types';
+import { ClientLike, Integration, OptionsV7 } from '@sentry/types';
 import { logger } from '@sentry/utils';
 
 export const installedIntegrations: string[] = [];
 
 /** Map of integrations assigned to a client */
 export interface IntegrationIndex {
-  [key: string]: IntegrationV7;
+  [key: string]: Integration;
 }
 
 /** Gets integration to install */
-export function getIntegrationsToSetup(options: OptionsV7): IntegrationV7[] {
+export function getIntegrationsToSetup(options: OptionsV7): Integration[] {
   const defaultIntegrations = (options.defaultIntegrations && [...options.defaultIntegrations]) || [];
   const userIntegrations = options.integrations;
-  let integrations: IntegrationV7[] = [];
+  let integrations: Integration[] = [];
   if (Array.isArray(userIntegrations)) {
     const userIntegrationsNames = userIntegrations.map(i => i.name);
     const pickedIntegrationsNames: string[] = [];

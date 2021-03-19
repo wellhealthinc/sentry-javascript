@@ -1,4 +1,4 @@
-import { ClientLike, IntegrationV7, Transaction, TransactionContext } from '@sentry/types';
+import { ClientLike, Integration, Transaction, TransactionContext } from '@sentry/types';
 import { getGlobalObject, logger } from '@sentry/utils';
 
 import { startIdleTransaction } from '../start';
@@ -100,7 +100,7 @@ const DEFAULT_BROWSER_TRACING_OPTIONS = {
  * The integration can be configured with a variety of options, and can be extended to use
  * any routing library. This integration uses {@see IdleTransaction} to create transactions.
  */
-export class BrowserTracing implements IntegrationV7 {
+export class BrowserTracing implements Integration {
   public name = this.constructor.name;
 
   /** Browser Tracing integration options */

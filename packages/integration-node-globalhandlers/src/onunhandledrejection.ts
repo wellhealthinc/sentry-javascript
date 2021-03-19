@@ -1,4 +1,4 @@
-import { ClientLike, IntegrationV7, ScopeContext } from '@sentry/types';
+import { ClientLike, Integration, ScopeContext } from '@sentry/types';
 import { consoleSandbox } from '@sentry/utils';
 
 import { logAndExitProcess } from './exit';
@@ -13,7 +13,7 @@ type PromiseRejectionWithDomainContext = {
 
 const DEFAULT_REJECTION_MODE = 'warn';
 
-export class OnUnhandledRejection implements IntegrationV7 {
+export class OnUnhandledRejection implements Integration {
   public name = this.constructor.name;
 
   public constructor(private _options: OnUncaughtExceptionOptions = {}) {}

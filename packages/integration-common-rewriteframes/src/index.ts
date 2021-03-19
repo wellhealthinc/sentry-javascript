@@ -1,4 +1,4 @@
-import { SentryEvent, StackFrame, Stacktrace, ClientLike, IntegrationV7 } from '@sentry/types';
+import { SentryEvent, StackFrame, Stacktrace, ClientLike, Integration } from '@sentry/types';
 import { basename, relative } from '@sentry/utils';
 
 type StackFrameIteratee = (frame: StackFrame) => StackFrame;
@@ -7,7 +7,7 @@ type RewriteFramesOptions = {
   iteratee?: StackFrameIteratee;
 };
 
-export class RewriteFrames implements IntegrationV7 {
+export class RewriteFrames implements Integration {
   public name = this.constructor.name;
 
   private readonly _root?: string;
