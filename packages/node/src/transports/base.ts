@@ -209,36 +209,34 @@ export abstract class BaseTransport implements Transport {
 
           res.setEncoding('utf8');
 
+          /**
+           * "Key-value pairs of header names and values. Header names are lower-cased."
+           * https://nodejs.org/api/http.html#http_message_headers
+           */
+          let retryAfterHeader = res.headers ? res.headers['retry-after'] : '';
+          retryAfterHeader = (Array.isArray(retryAfterHeader) ? retryAfterHeader[0] : retryAfterHeader) as string;
+
+          let rlHeader = res.headers ? res.headers['x-sentry-rate-limits'] : '';
+          rlHeader = (Array.isArray(rlHeader) ? rlHeader[0] : rlHeader) as string;
+
+          const headers = {
+            'x-sentry-rate-limits': rlHeader,
+            'retry-after': retryAfterHeader,
+          };
+
+          const limited = this._handleRateLimit(headers);
+          if (limited) logger.warn(`Too many requests, backing off until: ${this._disabledUntil(sentryReq.type)}`);
+
+          let rejectionMessage = `HTTP Error (${statusCode})`;
+          if (res.headers && res.headers['x-sentry-error']) {
+            rejectionMessage += `: ${res.headers['x-sentry-error']}`;
+          }
+
           if (status === Status.Success) {
             resolve({ status });
-          } else {
-            if (status === Status.RateLimit) {
-              /**
-               * "Key-value pairs of header names and values. Header names are lower-cased."
-               * https://nodejs.org/api/http.html#http_message_headers
-               */
-              let retryAfterHeader = res.headers ? res.headers['retry-after'] : '';
-              retryAfterHeader = (Array.isArray(retryAfterHeader) ? retryAfterHeader[0] : retryAfterHeader) as string;
-
-              let rlHeader = res.headers ? res.headers['x-sentry-rate-limits'] : '';
-              rlHeader = (Array.isArray(rlHeader) ? rlHeader[0] : rlHeader) as string;
-
-              const headers = {
-                'x-sentry-rate-limits': rlHeader,
-                'retry-after': retryAfterHeader,
-              };
-
-              const limited = this._handleRateLimit(headers);
-              if (limited) logger.warn(`Too many requests, backing off until: ${this._disabledUntil(sentryReq.type)}`);
-            }
-
-            let rejectionMessage = `HTTP Error (${statusCode})`;
-            if (res.headers && res.headers['x-sentry-error']) {
-              rejectionMessage += `: ${res.headers['x-sentry-error']}`;
-            }
-
-            reject(new SentryError(rejectionMessage));
           }
+
+          reject(new SentryError(rejectionMessage));
 
           // Force the socket to drain
           res.on('data', () => {
