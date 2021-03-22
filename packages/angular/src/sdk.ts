@@ -1,9 +1,10 @@
 import { BrowserOptions, init as browserInit, SDK_VERSION } from '@sentry/browser';
+import { ClientLike } from '@sentry/types';
 
 /**
  * Inits the Angular SDK
  */
-export function init(options: BrowserOptions): void {
+export function init(options: BrowserOptions): ClientLike {
   options._metadata = options._metadata || {};
   options._metadata.sdk = {
     name: 'sentry.javascript.angular',
@@ -15,5 +16,5 @@ export function init(options: BrowserOptions): void {
     ],
     version: SDK_VERSION,
   };
-  browserInit(options);
+  return browserInit(options);
 }

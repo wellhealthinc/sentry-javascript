@@ -1,9 +1,10 @@
 import { BrowserOptions, init as browserInit, SDK_VERSION } from '@sentry/browser';
+import { ClientLike } from '@sentry/types';
 
 /**
  * Inits the React SDK
  */
-export function init(options: BrowserOptions): void {
+export function init(options: BrowserOptions): ClientLike {
   options._metadata = options._metadata || {};
   if (options._metadata.sdk === undefined) {
     options._metadata.sdk = {
@@ -18,5 +19,5 @@ export function init(options: BrowserOptions): void {
     };
   }
 
-  browserInit(options);
+  return browserInit(options);
 }

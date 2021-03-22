@@ -9,6 +9,7 @@ import { OnUncaughtException, OnUnhandledRejection } from '@sentry/integration-n
 import { ConsoleBreadcrumbs, HTTPBreadcrumbs } from '@sentry/integration-node-breadcrumbs';
 
 import { NodeClient, NodeOptions } from './client';
+import { ClientLike } from '@sentry/types';
 
 export const defaultIntegrations = [
   new ConsoleBreadcrumbs(),
@@ -75,7 +76,7 @@ export const defaultIntegrations = [
  *
  * @see {@link NodeOptions} for documentation on configuration options.
  */
-export function init(options: NodeOptions = {}): void {
+export function init(options: NodeOptions = {}): ClientLike {
   if (options.defaultIntegrations === undefined) {
     options.defaultIntegrations = defaultIntegrations;
   }
@@ -112,5 +113,5 @@ export function init(options: NodeOptions = {}): void {
   const carrier = (domain as any).active ? getCarrier((domain as any).active) : getCarrier();
   const client = new NodeClient(options);
   carrier.client = client;
-  // TODO: Should we return client here instead of void?
+  return client;
 }

@@ -90,7 +90,7 @@ export const defaultIntegrations = [
  *
  * @see {@link BrowserOptions} for documentation on configuration options.
  */
-export function init(options: BrowserOptions = {}): void {
+export function init(options: BrowserOptions = {}): ClientLike {
   if (options.defaultIntegrations === undefined) {
     options.defaultIntegrations = defaultIntegrations;
   }
@@ -108,11 +108,12 @@ export function init(options: BrowserOptions = {}): void {
   const carrier = getCarrier();
   const client = new BrowserClient(options);
   carrier.client = client;
-  // TODO: Should we return client here instead of void?
 
   if (options.autoSessionTracking) {
     startSessionTracking(client);
   }
+
+  return client;
 }
 
 /**

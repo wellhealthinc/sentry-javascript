@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { BrowserOptions, init as browserInit, SDK_VERSION } from '@sentry/browser';
 import { captureException, getTransaction } from '@sentry/minimal';
-import { Span } from '@sentry/types';
+import { ClientLike, Span } from '@sentry/types';
 import { basename, getGlobalObject, logger, timestampWithMs } from '@sentry/utils';
 
 export interface VueOptions extends BrowserOptions {
@@ -125,7 +125,7 @@ interface TracingOptions {
  */
 export function init(
   options: Partial<Omit<VueOptions, 'tracingOptions'> & { tracingOptions: Partial<TracingOptions> }> = {},
-): void {
+): ClientLike {
   const finalOptions = {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     Vue: getGlobalObject<any>().Vue as VueInstance,
@@ -153,7 +153,8 @@ export function init(
     version: SDK_VERSION,
   };
 
-  browserInit(finalOptions);
+  const client = browserInit(finalOptions);
+
   if (finalOptions.Vue === undefined) {
     logger.warn('No Vue instance was provided. Also there is no Vue instance on the `window` object.');
     logger.warn('We will only capture global unhandled errors.');
@@ -161,6 +162,8 @@ export function init(
     const vueHelper = new VueHelper(finalOptions);
     vueHelper.setup();
   }
+
+  return client;
 }
 
 class VueHelper {
