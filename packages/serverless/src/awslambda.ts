@@ -7,7 +7,7 @@ import { types } from 'util';
 import { captureException, captureMessage, flush } from '@sentry/node';
 import * as Sentry from '@sentry/node';
 import { extractTraceparentData, startTransaction } from '@sentry/tracing';
-import { Integration, ScopeLike, Severity } from '@sentry/types';
+import { ClientLike, Integration, ScopeLike, Severity } from '@sentry/types';
 import { isString, logger } from '@sentry/utils';
 import { getCurrentClient } from '@sentry/minimal';
 // NOTE: I have no idea how to fix this right now, and don't want to waste more time, as it builds just fine — Kamil
@@ -46,7 +46,7 @@ export const defaultIntegrations: Integration[] = [...Sentry.defaultIntegrations
 /**
  * @see {@link Sentry.init}
  */
-export function init(options: Sentry.NodeOptions = {}): void {
+export function init(options: Sentry.NodeOptions = {}): ClientLike {
   if (options.defaultIntegrations === undefined) {
     options.defaultIntegrations = defaultIntegrations;
   }
@@ -64,8 +64,9 @@ export function init(options: Sentry.NodeOptions = {}): void {
     version: Sentry.SDK_VERSION,
   };
 
-  Sentry.init(options);
-  Sentry.addGlobalEventProcessor(serverlessEventProcessor);
+  const client = Sentry.init(options);
+  client.addEventProcessor(serverlessEventProcessor);
+  return client;
 }
 
 /** */

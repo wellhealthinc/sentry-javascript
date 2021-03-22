@@ -3,7 +3,6 @@ export { configureScope, withScope } from '@sentry/minimal';
 export { SDK_VERSION } from '@sentry/core';
 export {
   addBreadcrumb,
-  addGlobalEventProcessor,
   captureEvent,
   captureException,
   captureMessage,

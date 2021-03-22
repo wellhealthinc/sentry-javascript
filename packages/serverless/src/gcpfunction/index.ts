@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/node';
-import { Integration } from '@sentry/types';
+import { ClientLike, Integration } from '@sentry/types';
 
 import { GoogleCloudGrpc } from '../google-cloud-grpc';
 import { GoogleCloudHttp } from '../google-cloud-http';
@@ -18,7 +18,7 @@ export const defaultIntegrations: Integration[] = [
 /**
  * @see {@link Sentry.init}
  */
-export function init(options: Sentry.NodeOptions = {}): void {
+export function init(options: Sentry.NodeOptions = {}): ClientLike {
   if (options.defaultIntegrations === undefined) {
     options.defaultIntegrations = defaultIntegrations;
   }
@@ -36,6 +36,7 @@ export function init(options: Sentry.NodeOptions = {}): void {
     version: Sentry.SDK_VERSION,
   };
 
-  Sentry.init(options);
-  Sentry.addGlobalEventProcessor(serverlessEventProcessor);
+  const client = Sentry.init(options);
+  client.addEventProcessor(serverlessEventProcessor);
+  return client;
 }

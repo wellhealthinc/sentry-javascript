@@ -17,7 +17,6 @@ import {
   BreadcrumbHint,
 } from '@sentry/types';
 import { dateTimestampInSeconds, isPlainObject, isThenable, SyncPromise } from '@sentry/utils';
-import { getGlobalEventProcessors } from '@sentry/minimal';
 
 import { Session } from './session';
 
@@ -430,7 +429,7 @@ export class Scope implements ScopeLike {
     event.breadcrumbs = [...(event.breadcrumbs || []), ...this.breadcrumbs];
     event.breadcrumbs = event.breadcrumbs.length > 0 ? event.breadcrumbs : undefined;
 
-    return this._notifyEventProcessors([...getGlobalEventProcessors(), ...this._eventProcessors], event, hint);
+    return this._notifyEventProcessors(this._eventProcessors, event, hint);
   }
 
   /**

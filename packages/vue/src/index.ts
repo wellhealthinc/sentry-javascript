@@ -1,5 +1,4 @@
 export {
-  addGlobalEventProcessor,
   addBreadcrumb,
   captureException,
   captureEvent,

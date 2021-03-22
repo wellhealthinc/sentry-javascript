@@ -24,7 +24,6 @@ export {
   flush,
   close,
   wrap,
-  addGlobalEventProcessor,
   addBreadcrumb,
   captureException,
   captureEvent,

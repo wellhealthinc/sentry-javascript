@@ -2,13 +2,7 @@ import { ScopeLike } from '@sentry/types';
 
 import { getCurrentClient } from './carrier';
 
-export {
-  addGlobalEventProcessor,
-  getCarrier,
-  getCurrentClient,
-  getCurrentScope,
-  getGlobalEventProcessors,
-} from './carrier';
+export { getCarrier, getCurrentClient, getCurrentScope } from './carrier';
 export { captureException, captureMessage, captureEvent, close, flush, lastEventId } from './client';
 export {
   addBreadcrumb,

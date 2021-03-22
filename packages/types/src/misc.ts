@@ -15,7 +15,6 @@ export interface SentryGlobal {
   // of Sentry, but using different verisons, eg V5+V7.
   __SENTRY_V7__: CarrierV7;
   __SENTRY__: {
-    globalEventProcessors: any;
     hub: any;
     logger: any;
   };

@@ -1,6 +1,5 @@
 export { Scope } from '@sentry/scope';
 export {
-  addGlobalEventProcessor,
   addBreadcrumb,
   configureScope,
   withScope,
