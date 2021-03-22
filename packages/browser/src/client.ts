@@ -72,20 +72,4 @@ export class BrowserClient extends BaseClient<BrowserOptions> {
   protected _eventFromMessage(message: string, captureContext: CaptureContext): PromiseLike<SentryEvent> {
     return eventFromMessage(this.options, message, captureContext);
   }
-
-  // TODO: Restore this functionality somewhere else, it definitely shouldn't be here.
-  // protected _sendEvent(event: SentryEvent): void {
-  //   this.getScope()?.addBreadcrumb(
-  //     {
-  //       category: `sentry.${event.type === 'transaction' ? 'transaction' : 'event'}`,
-  //       event_id: event.event_id,
-  //       level: event.level,
-  //       message: getEventDescription(event),
-  //     },
-  //     {
-  //       event,
-  //     },
-  //   );
-  //   super._sendEvent(event);
-  // }
 }

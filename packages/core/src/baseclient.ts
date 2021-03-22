@@ -10,6 +10,7 @@ import {
 } from '@sentry/types';
 import {
   dateTimestampInSeconds,
+  getEventDescription,
   isPrimitive,
   isThenable,
   logger,
@@ -121,6 +122,7 @@ export abstract class BaseClient<O extends OptionsV7> implements ClientLike<O> {
    * @inheritDoc
    */
   public captureException(exception: unknown, captureContext: CaptureContext = {}): string | undefined {
+    // TODO: This is broken. a) we dont pass event_id in hint anymore, b) its sync value assigned in async callback
     let eventId = captureContext.hint?.event_id;
 
     this._process(
@@ -465,6 +467,19 @@ export abstract class BaseClient<O extends OptionsV7> implements ClientLike<O> {
   protected _captureEvent(event: SentryEvent, captureContext: CaptureContext): PromiseLike<string | undefined> {
     return this._processEvent(event, captureContext).then(
       finalEvent => {
+        // TODO: Make it configurable or move to @sentry/integration-browser-breadcrumbs
+        const eventType = finalEvent.type === 'transaction' ? 'transaction' : 'event';
+        this.getScope().addBreadcrumb(
+          {
+            category: `sentry.${eventType}`,
+            event_id: finalEvent.event_id,
+            level: finalEvent.level,
+            message: getEventDescription(finalEvent),
+          },
+          {
+            event: finalEvent,
+          },
+        );
         return finalEvent.event_id;
       },
       reason => {
