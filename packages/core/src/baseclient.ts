@@ -295,11 +295,6 @@ export abstract class BaseClient<O extends OptionsV7> implements ClientLike<O> {
     });
   }
 
-  /** Determines whether this SDK is enabled and a valid Dsn is present. */
-  protected _isEnabled(): boolean {
-    return this.options.enabled !== false && this._dsn !== undefined;
-  }
-
   /**
    * Adds common information to events.
    *
@@ -506,7 +501,7 @@ export abstract class BaseClient<O extends OptionsV7> implements ClientLike<O> {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { beforeSend, sampleRate } = this.options;
 
-    if (!this._isEnabled()) {
+    if (this.options.enabled === false) {
       return SyncPromise.reject(new SentryError('SDK not enabled, will not send event.'));
     }
 
