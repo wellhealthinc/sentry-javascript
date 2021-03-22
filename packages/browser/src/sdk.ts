@@ -1,7 +1,7 @@
 import { ClientLike } from '@sentry/types';
 import { captureException, getCarrier, getCurrentClient } from '@sentry/minimal';
 import { addInstrumentationHandler, getGlobalObject, logger } from '@sentry/utils';
-import { ReportDialogOptions } from '@sentry/transport-base';
+import { Dsn, getReportDialogEndpoint, ReportDialogOptions } from '@sentry/transport-base';
 import { InboundFilters } from '@sentry/integration-common-inboundfilters';
 import { UserAgent } from '@sentry/integration-browser-useragent';
 import { EventTargetWrap, TimersWrap, XHRWrap } from '@sentry/integration-browser-wrap';
@@ -16,7 +16,6 @@ import { LinkedErrors } from '@sentry/integration-browser-linkederrors';
 import { OnError, OnUnhandledRejection } from '@sentry/integration-browser-globalhandlers';
 
 import { BrowserClient, BrowserOptions } from './client';
-import { injectReportDialog } from './helpers';
 
 export const defaultIntegrations = [
   new EventTargetWrap(),
@@ -121,28 +120,50 @@ export function init(options: BrowserOptions = {}): void {
  *
  * @param options Everything is optional, we try to fetch all info need from the global scope.
  */
-export function showReportDialog(options: ReportDialogOptions = {}, client?: ClientLike): void {
+export function showReportDialog(
+  options: ReportDialogOptions & { onLoad?(): void } = {},
+  customClient?: ClientLike,
+): void {
+  const errPrefix = `Trying to call showReportDialog with`;
+
   // doesn't work without a document (React Native)
-  const document = getGlobalObject<Window>().document;
-  if (!document) {
+  const global = getGlobalObject<Window>();
+  if (!global.document) {
     return;
   }
 
-  const usableClient = client ?? getCurrentClient();
-  if (!usableClient) {
+  const client = customClient ?? getCurrentClient();
+  if (!client) {
     return;
   }
 
-  options.eventId = options.eventId ?? usableClient.lastEventId();
-  options.dsn = options.dsn ?? usableClient.getDsn()?.toString();
+  options.eventId = options.eventId ?? client.lastEventId();
+  options.dsn = options.dsn ?? client.getDsn()?.toString();
 
-  // TODO: Should we keep `isEnabled` around?
-  // if (!this._isEnabled()) {
-  //   logger.error('Trying to call showReportDialog with Sentry Client disabled');
-  //   return;
-  // }
+  if (client.options.enabled === false) {
+    logger.error(`${errPrefix} disabled client`);
+    return;
+  }
 
-  injectReportDialog(options);
+  if (!options.eventId) {
+    logger.error(`${errPrefix} missing EventID`);
+    return;
+  }
+
+  if (!options.dsn) {
+    logger.error(`${errPrefix} missing DSN`);
+    return;
+  }
+
+  const script = document.createElement('script');
+  script.async = true;
+  script.src = getReportDialogEndpoint(new Dsn(options.dsn));
+
+  if (options.onLoad) {
+    script.onload = options.onLoad; // eslint-disable-line @typescript-eslint/unbound-method
+  }
+
+  (global.document.head || global.document.body).appendChild(script);
 }
 
 /**
