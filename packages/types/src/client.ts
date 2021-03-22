@@ -18,7 +18,7 @@ export interface ClientLike<O extends OptionsV7 = OptionsV7> {
   options: O;
 
   lastEventId(): string | undefined;
-  getScope(): ScopeLike | undefined;
+  getScope(): ScopeLike;
   addEventProcessor(callback: EventProcessor): void;
   // TODO: To be removed? Can be obtained from options
   getDsn(): Dsn | undefined;

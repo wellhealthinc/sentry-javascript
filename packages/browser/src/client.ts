@@ -1,9 +1,8 @@
 import { BaseClient, SDK_VERSION } from '@sentry/core';
-import { CaptureContext, SentryEvent, Options, ScopeLike } from '@sentry/types';
+import { CaptureContext, SentryEvent, Options } from '@sentry/types';
 import { supportsFetch } from '@sentry/utils';
 import { FetchTransport } from '@sentry/transport-fetch';
 import { XHRTransport } from '@sentry/transport-xhr';
-import { getCarrier } from '@sentry/minimal';
 import { eventFromException, eventFromMessage } from '@sentry/eventbuilder-browser';
 
 /**
@@ -59,10 +58,6 @@ export class BrowserClient extends BaseClient<BrowserOptions> {
     options.transport = options.transport ?? (supportsFetch() ? FetchTransport : XHRTransport);
 
     super(options);
-  }
-
-  public getScope(): ScopeLike | undefined {
-    return this._scope || getCarrier().scope;
   }
 
   protected _eventFromException(exception: unknown, captureContext: CaptureContext): PromiseLike<SentryEvent> {

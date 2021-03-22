@@ -29,7 +29,7 @@ export class HistoryBreadcrumbs implements Integration {
           from = parsedFrom.relative;
         }
 
-        client.getScope()?.addBreadcrumb({
+        client.getScope().addBreadcrumb({
           category: 'navigation',
           data: {
             from,

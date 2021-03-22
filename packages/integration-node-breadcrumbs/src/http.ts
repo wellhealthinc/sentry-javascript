@@ -124,7 +124,7 @@ function _createWrappedRequestMethodFactory(
           // eslint-disable-next-line @typescript-eslint/no-this-alias
           const req = this;
           if (options.breadcrumbsEnabled) {
-            client.getScope()?.addBreadcrumb(
+            client.getScope().addBreadcrumb(
               {
                 category: 'http',
                 data: {
@@ -154,7 +154,7 @@ function _createWrappedRequestMethodFactory(
           const req = this;
 
           if (options.breadcrumbsEnabled) {
-            client.getScope()?.addBreadcrumb(
+            client.getScope().addBreadcrumb(
               {
                 category: 'http',
                 data: {

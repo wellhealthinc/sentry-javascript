@@ -26,7 +26,7 @@ export class XHRBreadcrumbs implements Integration {
 
         const { method, url, status_code, body } = handlerData.xhr.__sentry_xhr__ || {};
 
-        client.getScope()?.addBreadcrumb(
+        client.getScope().addBreadcrumb(
           {
             category: 'xhr',
             data: {

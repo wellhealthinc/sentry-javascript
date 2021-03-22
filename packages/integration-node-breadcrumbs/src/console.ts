@@ -47,7 +47,7 @@ function createConsoleWrapper(level: string, client: ClientLike): (originalConso
     }
 
     return function(this: typeof console, ...args: unknown[]): void {
-      client.getScope()?.addBreadcrumb(
+      client.getScope().addBreadcrumb(
         {
           category: 'console',
           level: sentryLevel,

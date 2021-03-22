@@ -45,7 +45,7 @@ export class FetchBreadcrumbs implements Integration {
           hint.response = handlerData.response;
         }
 
-        client.getScope()?.addBreadcrumb(breadcrumb, hint);
+        client.getScope().addBreadcrumb(breadcrumb, hint);
       },
     });
   }

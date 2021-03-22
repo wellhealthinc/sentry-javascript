@@ -143,7 +143,7 @@ export class Mongo implements Integration {
     fill(collection.prototype, operation, function(orig: () => void | Promise<unknown>) {
       return function(this: unknown, ...args: unknown[]) {
         const lastArg = args[args.length - 1];
-        const parentSpan = client.getScope()?.getSpan();
+        const parentSpan = client.getScope().getSpan();
 
         // Check if the operation was passed a callback. (mapReduce requires a different check, as
         // its (non-callback) arguments can also be functions.)

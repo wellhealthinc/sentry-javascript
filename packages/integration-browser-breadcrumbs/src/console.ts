@@ -28,7 +28,7 @@ export class ConsoleBreadcrumbs implements Integration {
           }
         }
 
-        client.getScope()?.addBreadcrumb(breadcrumb, {
+        client.getScope().addBreadcrumb(breadcrumb, {
           input: handlerData.args,
           level: handlerData.level,
         });

@@ -30,7 +30,7 @@ export class Postgres implements Integration {
      */
     fill(pgClient.prototype, 'query', function(orig: () => void | Promise<unknown>) {
       return function(this: unknown, config: unknown, values: unknown, callback: unknown) {
-        const parentSpan = client.getScope()?.getSpan();
+        const parentSpan = client.getScope().getSpan();
         const span = parentSpan?.startChild({
           description: typeof config === 'string' ? config : (config as { text: string }).text,
           op: `db`,

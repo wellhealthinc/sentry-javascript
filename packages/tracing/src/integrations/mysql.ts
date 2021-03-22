@@ -28,7 +28,7 @@ export class Mysql implements Integration {
     //    function (options, values, callback) => void
     fill(connection.prototype, 'query', function(orig: () => void) {
       return function(this: unknown, options: unknown, values: unknown, callback: unknown) {
-        const parentSpan = client.getScope()?.getSpan();
+        const parentSpan = client.getScope().getSpan();
         const span = parentSpan?.startChild({
           description: typeof options === 'string' ? options : (options as { sql: string }).sql,
           op: `db`,

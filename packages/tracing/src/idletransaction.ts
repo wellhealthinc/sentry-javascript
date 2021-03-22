@@ -91,7 +91,7 @@ export class IdleTransaction extends Transaction {
       // We set the transaction here on the scope so error events pick up the trace
       // context and attach it to the error.
       logger.log(`Setting idle transaction on scope. Span ID: ${this.spanId}`);
-      _client.getScope()?.setSpan(this);
+      _client.getScope().setSpan(this);
     }
 
     this._initTimeout = setTimeout(() => {

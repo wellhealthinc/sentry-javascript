@@ -80,7 +80,7 @@ export abstract class BaseClient<O extends OptionsV7> implements ClientLike<O> {
 
   protected _lastEventId?: string;
 
-  protected _scope?: ScopeLike;
+  protected _scope = new Scope();
 
   protected _eventProcessors: EventProcessor[] = [];
 
@@ -104,7 +104,7 @@ export abstract class BaseClient<O extends OptionsV7> implements ClientLike<O> {
     return this._lastEventId;
   }
 
-  public getScope(): ScopeLike | undefined {
+  public getScope(): ScopeLike {
     return this._scope;
   }
 
@@ -549,7 +549,7 @@ export abstract class BaseClient<O extends OptionsV7> implements ClientLike<O> {
           throw new SentryError('`beforeSend` returned `null`, will not send event.');
         }
 
-        const session = this.getScope()?.getSession();
+        const session = this.getScope().getSession();
         if (!isTransaction && session) {
           this._updateSessionFromEvent(session as Session, processedEvent);
         }

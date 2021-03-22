@@ -61,12 +61,9 @@ export class NodeClient extends BaseClient<NodeOptions> {
     super(options);
   }
 
-  public getScope(): ScopeLike | undefined {
-    if (this._scope) {
-      return this._scope;
-    }
-
+  public getScope(): ScopeLike {
     const activeDomain = ((domain as unknown) as { active: SentryGlobal }).active;
+
     if (activeDomain) {
       const domainScope = getCarrier(activeDomain).scope;
       if (domainScope) {
@@ -74,7 +71,7 @@ export class NodeClient extends BaseClient<NodeOptions> {
       }
     }
 
-    return getCarrier().scope;
+    return this._scope;
   }
 
   protected _eventFromException(exception: unknown, captureContext: CaptureContext): PromiseLike<SentryEvent> {

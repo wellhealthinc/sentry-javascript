@@ -29,7 +29,7 @@ export class DOMBreadcrumbs implements Integration {
           return;
         }
 
-        client.getScope()?.addBreadcrumb(
+        client.getScope().addBreadcrumb(
           {
             category: `ui.${handlerData.name}`,
             message: target,
