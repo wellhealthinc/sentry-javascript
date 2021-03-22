@@ -14,9 +14,9 @@
   "types": "dist/index.d.ts",
   "dependencies": {
     "@sentry/transport-base": "7.0.0-alpha.0",
-    "@sentry/types": "6.2.1",
-    "@sentry/utils": "6.2.1",
-    "@sentry/core": "6.2.1",
+    "@sentry/types": "6.2.3",
+    "@sentry/utils": "6.2.3",
+    "@sentry/core": "6.2.3",
     "https-proxy-agent": "5.0.0"
   },
   "scripts": {

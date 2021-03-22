@@ -13,9 +13,9 @@
   "module": "esm/index.js",
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@sentry/minimal": "6.2.1",
-    "@sentry/utils": "6.2.1",
-    "@sentry/types": "6.2.1"
+    "@sentry/minimal": "6.2.3",
+    "@sentry/utils": "6.2.3",
+    "@sentry/types": "6.2.3"
   },
   "scripts": {
     "build": "run-p build:es5 build:esm",

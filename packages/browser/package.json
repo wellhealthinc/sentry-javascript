@@ -24,7 +24,7 @@
     "@sentry/integration-browser-useragent": "7.0.0-alpha.0",
     "@sentry/integration-browser-wrap": "7.0.0-alpha.0",
     "@sentry/integration-common-inboundfilters": "7.0.0-alpha.0",
-    "@sentry/minimal": "6.2.1",
+    "@sentry/minimal": "6.2.3",
     "@sentry/transport-base": "7.0.0-alpha.0",
     "@sentry/transport-fetch": "7.0.0-alpha.0",
     "@sentry/transport-xhr": "7.0.0-alpha.0",

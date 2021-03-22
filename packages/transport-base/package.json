@@ -13,7 +13,7 @@
   "module": "esm/index.js",
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@sentry/types": "6.2.1"
+    "@sentry/types": "6.2.3"
   },
   "scripts": {
     "build": "run-p build:es5 build:esm",

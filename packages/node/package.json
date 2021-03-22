@@ -23,7 +23,7 @@
     "@sentry/integration-node-contextlines": "7.0.0-alpha.0",
     "@sentry/integration-node-globalhandlers": "7.0.0-alpha.0",
     "@sentry/integration-node-linkederrors": "7.0.0-alpha.0",
-    "@sentry/minimal": "6.2.1",
+    "@sentry/minimal": "6.2.3",
     "@sentry/scope": "7.0.0-alpha.0",
     "@sentry/tracing": "6.2.3",
     "@sentry/transport-base": "7.0.0-alpha.0",
