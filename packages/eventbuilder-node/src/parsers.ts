@@ -1,21 +1,7 @@
-import { readFile } from 'fs';
-
-import { SentryEvent, Exception, ExtendedError, OptionsV7, StackFrame } from '@sentry/types';
-import { addContextToFrame, basename, dirname, SyncPromise } from '@sentry/utils';
-import { LRUMap } from 'lru_map';
+import { SentryEvent, Exception, ExtendedError, StackFrame } from '@sentry/types';
+import { basename, dirname, SyncPromise } from '@sentry/utils';
 
 import * as stacktrace from './stacktrace';
-
-const DEFAULT_LINES_OF_CONTEXT: number = 7;
-const FILE_CONTENT_CACHE = new LRUMap<string, string | null>(100);
-
-/**
- * Resets the file cache. Exists for testing purposes.
- * @hidden
- */
-export function resetFileContentCache(): void {
-  FILE_CONTENT_CACHE.clear();
-}
 
 function getFunction(frame: stacktrace.StackFrame): string {
   try {
@@ -61,65 +47,6 @@ function getModule(filename: string, base?: string): string {
 }
 
 /**
- * This function reads file contents and caches them in a global LRU cache.
- * Returns a Promise filepath => content array for all files that we were able to read.
- *
- * @param filenames Array of filepaths to read content from.
- */
-function readSourceFiles(filenames: string[]): PromiseLike<{ [key: string]: string | null }> {
-  // we're relying on filenames being de-duped already
-  if (filenames.length === 0) {
-    return SyncPromise.resolve({});
-  }
-
-  return new SyncPromise<{
-    [key: string]: string | null;
-  }>(resolve => {
-    const sourceFiles: {
-      [key: string]: string | null;
-    } = {};
-
-    let count = 0;
-    // eslint-disable-next-line @typescript-eslint/prefer-for-of
-    for (let i = 0; i < filenames.length; i++) {
-      const filename = filenames[i];
-
-      const cache = FILE_CONTENT_CACHE.get(filename);
-      // We have a cache hit
-      if (cache !== undefined) {
-        // If it's not null (which means we found a file and have a content)
-        // we set the content and return it later.
-        if (cache !== null) {
-          sourceFiles[filename] = cache;
-        }
-        // eslint-disable-next-line no-plusplus
-        count++;
-        // In any case we want to skip here then since we have a content already or we couldn't
-        // read the file and don't want to try again.
-        if (count === filenames.length) {
-          resolve(sourceFiles);
-        }
-        continue;
-      }
-
-      readFile(filename, (err: Error | null, data: Buffer) => {
-        const content = err ? null : data.toString();
-        sourceFiles[filename] = content;
-
-        // We always want to set the cache, even to null which means there was an error reading the file.
-        // We do not want to try to read the file again.
-        FILE_CONTENT_CACHE.set(filename, content);
-        // eslint-disable-next-line no-plusplus
-        count++;
-        if (count === filenames.length) {
-          resolve(sourceFiles);
-        }
-      });
-    }
-  });
-}
-
-/**
  * @hidden
  */
 export function extractStackFromError(error: Error): stacktrace.StackFrame[] {
@@ -133,15 +60,7 @@ export function extractStackFromError(error: Error): stacktrace.StackFrame[] {
 /**
  * @hidden
  */
-export function parseStack(stack: stacktrace.StackFrame[], options?: OptionsV7): PromiseLike<StackFrame[]> {
-  const filesToRead: string[] = [];
-
-  // TODO: Move context lines to a separate integration
-  const linesOfContext =
-    options && (options as { frameContextLines?: number }).frameContextLines !== undefined
-      ? (options as { frameContextLines: number }).frameContextLines
-      : DEFAULT_LINES_OF_CONTEXT;
-
+export function parseStack(stack: stacktrace.StackFrame[]): PromiseLike<StackFrame[]> {
   const frames: StackFrame[] = stack.map(frame => {
     const parsedFrame: StackFrame = {
       colno: frame.columnNumber,
@@ -166,69 +85,22 @@ export function parseStack(stack: stacktrace.StackFrame[], options?: OptionsV7):
     // Extract a module name based on the filename
     if (parsedFrame.filename) {
       parsedFrame.module = getModule(parsedFrame.filename);
-
-      if (!isInternal && linesOfContext > 0 && filesToRead.indexOf(parsedFrame.filename) === -1) {
-        filesToRead.push(parsedFrame.filename);
-      }
     }
 
     return parsedFrame;
   });
 
-  // We do an early return if we do not want to fetch context liens
-  if (linesOfContext <= 0) {
-    return SyncPromise.resolve(frames);
-  }
-
-  try {
-    return addPrePostContext(filesToRead, frames, linesOfContext);
-  } catch (_) {
-    // This happens in electron for example where we are not able to read files from asar.
-    // So it's fine, we recover be just returning all frames without pre/post context.
-    return SyncPromise.resolve(frames);
-  }
-}
-
-/**
- * This function tries to read the source files + adding pre and post context (source code)
- * to a frame.
- * @param filesToRead string[] of filepaths
- * @param frames StackFrame[] containg all frames
- */
-function addPrePostContext(
-  filesToRead: string[],
-  frames: StackFrame[],
-  linesOfContext: number,
-): PromiseLike<StackFrame[]> {
-  return new SyncPromise<StackFrame[]>(resolve =>
-    readSourceFiles(filesToRead).then(sourceFiles => {
-      const result = frames.map(frame => {
-        if (frame.filename && sourceFiles[frame.filename]) {
-          try {
-            const lines = (sourceFiles[frame.filename] as string).split('\n');
-
-            addContextToFrame(lines, frame, linesOfContext);
-          } catch (e) {
-            // anomaly, being defensive in case
-            // unlikely to ever happen in practice but can definitely happen in theory
-          }
-        }
-        return frame;
-      });
-
-      resolve(result);
-    }),
-  );
+  return SyncPromise.resolve(frames);
 }
 
 /**
  * @hidden
  */
-export function getExceptionFromError(error: Error, options?: OptionsV7): PromiseLike<Exception> {
+export function getExceptionFromError(error: Error): PromiseLike<Exception> {
   const name = error.name || error.constructor.name;
   const stack = extractStackFromError(error);
   return new SyncPromise<Exception>(resolve =>
-    parseStack(stack, options).then(frames => {
+    parseStack(stack).then(frames => {
       const result = {
         stacktrace: {
           frames: prepareFramesForEvent(frames),
@@ -244,9 +116,9 @@ export function getExceptionFromError(error: Error, options?: OptionsV7): Promis
 /**
  * @hidden
  */
-export function parseError(error: ExtendedError, options?: OptionsV7): PromiseLike<SentryEvent> {
+export function parseError(error: ExtendedError): PromiseLike<SentryEvent> {
   return new SyncPromise<SentryEvent>(resolve =>
-    getExceptionFromError(error, options).then((exception: Exception) => {
+    getExceptionFromError(error).then((exception: Exception) => {
       resolve({
         exception: {
           values: [exception],

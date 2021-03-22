@@ -4,6 +4,7 @@ import { getCarrier } from '@sentry/minimal';
 import { getGlobalObject } from '@sentry/utils';
 import { InboundFilters } from '@sentry/integration-common-inboundfilters';
 import { LinkedErrors } from '@sentry/integration-node-linkederrors';
+import { ContextLines } from '@sentry/integration-node-contextlines';
 import { OnUncaughtException, OnUnhandledRejection } from '@sentry/integration-node-globalhandlers';
 import { ConsoleBreadcrumbs, HTTPBreadcrumbs } from '@sentry/integration-node-breadcrumbs';
 
@@ -13,6 +14,7 @@ export const defaultIntegrations = [
   new ConsoleBreadcrumbs(),
   new HTTPBreadcrumbs(),
   new LinkedErrors(),
+  new ContextLines(),
   new InboundFilters(),
   new OnUncaughtException(),
   new OnUnhandledRejection(),

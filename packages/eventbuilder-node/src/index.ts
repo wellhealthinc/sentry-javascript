@@ -45,7 +45,7 @@ export function eventFromException(
   }
 
   return new SyncPromise<SentryEvent>((resolve, reject) =>
-    parseError(ex as Error, options)
+    parseError(ex as Error)
       .then(event => {
         addExceptionTypeValue(event, undefined, undefined);
         addExceptionMechanism(event, mechanism);
@@ -85,7 +85,7 @@ export function eventFromMessage(
   return new SyncPromise<SentryEvent>(resolve => {
     if (options.attachStacktrace && captureContext.hint?.syntheticException) {
       const stack = extractStackFromError(captureContext.hint?.syntheticException);
-      parseStack(stack, options)
+      parseStack(stack)
         .then(frames => {
           event.stacktrace = {
             frames: prepareFramesForEvent(frames),
