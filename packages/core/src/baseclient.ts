@@ -320,30 +320,19 @@ export abstract class BaseClient<O extends OptionsV7> implements ClientLike<O> {
     this._applyClientOptions(prepared);
     this._applyIntegrationsMetadata(prepared);
 
-    // If we have scope given to us, use it as the base for further modifications.
-    // This allows us to prevent unnecessary copying of data if `captureContext` is not provided.
-
     // TODO: We should be able to remove scope as dependency here somehow
-    let finalScope = this.getScope() || new Scope();
-    if (captureContext?.scope) {
-      finalScope = (finalScope?.clone() || new Scope()).update(captureContext?.scope);
-    }
+    const scope =
+      captureContext.scope instanceof Scope
+        ? captureContext.scope
+        : this.getScope()
+            .clone()
+            .update(captureContext.scope);
 
-    // We prepare the result here with a resolved Event.
-    let result = SyncPromise.resolve<SentryEvent | null>(prepared);
-
-    // This should be the last thing called, since we want that
-    // {@link Hub.addEventProcessor} gets the finished prepared event.
-    if (finalScope) {
-      // In case we have a hub we reassign it.
-      result = finalScope.applyToEvent(prepared, captureContext?.hint);
-    }
-
-    return result.then(evt => {
+    return scope.applyToEvent(prepared, captureContext.hint).then(event => {
       if (typeof normalizeDepth === 'number' && normalizeDepth > 0) {
-        return this._normalizeEvent(evt, normalizeDepth);
+        return this._normalizeEvent(event, normalizeDepth);
       }
-      return evt;
+      return event;
     });
   }
 
